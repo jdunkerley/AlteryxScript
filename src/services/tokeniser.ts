@@ -33,7 +33,7 @@ const TokenPrecedence = [
 
 export const TokenPatterns : ITokenPatterns  = {
     [TokenType.WhiteSpace]: (s:string) => regexpToken(s, /^(\s+)/m),
-    [TokenType.Operator]: (s:string) => regexpToken(s, /^(\+|*|\/|%|-|==|<=|>=|<|>)/),
+    [TokenType.Operator]: (s:string) => regexpToken(s, /^(\+|\*|\/|%|-|==|<=|>=|<|>)/),
     [TokenType.Assignment]: (s:string) => s[0] === '=' ? '=' : null,
     [TokenType.Comment]: (s:string) => regexpToken(s, /^(\\.*?)\r/),
     [TokenType.Number]: (s:string) => regexpToken(s, /^([0-9][0-9.]*)/)
@@ -61,7 +61,6 @@ export const tokenise = (input:string) => {
     let idx = 0
     while (idx < input.length) {
         const nextToken = GetNextToken(input.substr(idx))
-        console.log(nextToken)
         if (nextToken && nextToken.Value) {
             idx += nextToken.Value.length
             tokens.push(nextToken)
