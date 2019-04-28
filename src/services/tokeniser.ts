@@ -33,7 +33,7 @@ const TokenPrecedence = [
 
 export const TokenPatterns : ITokenPatterns  = {
     [TokenType.WhiteSpace]: (s:string) => regexpToken(s, /^(\s+)/m),
-    [TokenType.Operator]: (s:string) => regexpToken(s, /^(+|*|\/|%|-|==|<=|>=|<|>)/),
+    [TokenType.Operator]: (s:string) => regexpToken(s, /^(\+|*|\/|%|-|==|<=|>=|<|>)/),
     [TokenType.Assignment]: (s:string) => s[0] === '=' ? '=' : null,
     [TokenType.Comment]: (s:string) => regexpToken(s, /^(\\.*?)\r/),
     [TokenType.Number]: (s:string) => regexpToken(s, /^([0-9][0-9.]*)/)
