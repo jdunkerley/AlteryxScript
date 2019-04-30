@@ -3,8 +3,19 @@ export enum TokenType {
     Operator = "Operator",
     Assignment = "Assignment",
     Comment = "Comment",
-    Number = "Number"
+    Number = "Number",
+    String = "String",
+    Error = "Error"
 }
+
+const TokenPrecedence = [
+    TokenType.WhiteSpace,
+    TokenType.Comment,
+    TokenType.Operator,
+    TokenType.Assignment,
+    TokenType.Number,
+    TokenType.String
+]
 
 export type Token = {
     Type: TokenType
@@ -15,7 +26,7 @@ interface ITokenPatterns  {
     [s: string]: (s:string) => string | null
 }
 
-const regexpToken : (s: string, r: RegExp) => string | null = (s: string, r: RegExp) => {
+const regExpMatch : (s:string, r:RegExp) => string | null = (s:string, r:RegExp) => {
     const match = s.match(r)
     if (match) {
         return match[1]
@@ -23,20 +34,13 @@ const regexpToken : (s: string, r: RegExp) => string | null = (s: string, r: Reg
     return null
 }
 
-const TokenPrecedence = [
-    TokenType.WhiteSpace,
-    TokenType.Comment,
-    TokenType.Operator,
-    TokenType.Assignment,
-    TokenType.Number
-]
-
 export const TokenPatterns : ITokenPatterns  = {
-    [TokenType.WhiteSpace]: (s:string) => regexpToken(s, /^(\s+)/m),
-    [TokenType.Operator]: (s:string) => regexpToken(s, /^(\+|\*|\/|%|-|==|<=|>=|<|>)/),
+    [TokenType.WhiteSpace]: (s:string) => regExpMatch(s, /^(\s+)/m),
+    [TokenType.Operator]: (s:string) => regExpMatch(s, /^(\+|\*|\/|%|-|==|<=|>=|<|>)/),
     [TokenType.Assignment]: (s:string) => s[0] === '=' ? '=' : null,
-    [TokenType.Comment]: (s:string) => regexpToken(s, /^(\\.*?)\r/),
-    [TokenType.Number]: (s:string) => regexpToken(s, /^([0-9][0-9.]*)/)
+    [TokenType.Comment]: (s:string) => regExpMatch(s, /^(\\.*?)\r/),
+    [TokenType.Number]: (s:string) => regExpMatch(s, /^([0-9][0-9.]*)/),
+    [TokenType.String]: (s:string) => regExpMatch(s, /^(('|").*?[^\\](\2))/)
 }
 
 const GetNextToken : (input:string) => Token = (input:string) => {
