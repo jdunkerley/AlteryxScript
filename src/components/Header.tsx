@@ -1,8 +1,8 @@
 import React from 'react'
-import { withStyles, WithStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
+import { withStyles, WithStyles } from '@material-ui/core/styles'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
 
 const styles = {
   root: {
@@ -14,7 +14,7 @@ export interface Props extends WithStyles<typeof styles> {
 }
 
 const Header: React.FC<Props> = (props: Props) => {
-  const { classes } = props;
+  const { classes } = props
 
   return (
     <div className={classes.root}>
@@ -22,7 +22,7 @@ const Header: React.FC<Props> = (props: Props) => {
         <Toolbar>
           <Typography variant="h6" color="inherit">
             Alteryx Script
-                    </Typography>
+          </Typography>
         </Toolbar>
       </AppBar>
     </div>

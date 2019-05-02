@@ -1,4 +1,5 @@
-import { tokenise, TokenType, TokenPatterns } from './tokeniser'
+import { TokenType } from './TokenType'
+import tokenise from './tokeniser'
 
 it('Can tokenise a number in whitespace', () => {
     const number = '1234567890'

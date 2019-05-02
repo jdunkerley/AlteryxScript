@@ -1,4 +1,5 @@
-import { tokenise, TokenType, TokenPatterns } from './tokeniser'
+import { TokenType } from './TokenType'
+import tokenise, { TokenPatterns } from './tokeniser'
 
 it('Can get a Number pattern', () => {
     const pattern = TokenPatterns[TokenType.Number]

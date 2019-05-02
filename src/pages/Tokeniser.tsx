@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import { Token, TokenType, tokenise } from '../services/tokeniser';
+import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
+import Paper from '@material-ui/core/Paper'
+import Grid from '@material-ui/core/Grid'
+import Typography from '@material-ui/core/Typography'
+import TextField from '@material-ui/core/TextField'
+import { Token, TokenType } from '../services/TokenType'
+import tokenise from '../services/tokeniser'
 
 const styles = createStyles({
   root: {
@@ -24,7 +25,7 @@ export interface Props extends WithStyles<typeof styles> {
 }
 
 const Tokeniser: React.FC<Props> = (props: Props) => {
-  const { classes } = props;
+  const { classes } = props
   const [ codeBlock, setCodeBlock ] = useState<Token[]>([])
 
   const handleOnChange = (event: any) => {
@@ -66,8 +67,9 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
           </Typography>
           { codeBlock.map((token, i) => (
             <Paper className={classes.paper}>
-              <Typography variant="title" color={token.Type === TokenType.Error ? 'error' : 'inherit'}>{token.Type}</Typography>
-              <pre>{token.Value}</pre>
+              <Typography variant="title" color={token.Type === TokenType.Error ? 'error' : 'inherit'}>
+                {token.Type} : {token.Value}
+              </Typography>
             </Paper>
           ))}
         </Grid>

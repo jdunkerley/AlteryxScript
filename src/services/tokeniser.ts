@@ -1,26 +1,19 @@
-export enum TokenType {
-    WhiteSpace = "WhiteSpace",
-    Operator = "Operator",
-    Assignment = "Assignment",
-    Comment = "Comment",
-    Number = "Number",
-    String = "String",
-    Error = "Error"
-}
+import { Token, TokenType } from './TokenType'
 
 const TokenPrecedence = [
     TokenType.WhiteSpace,
     TokenType.Comment,
     TokenType.Operator,
     TokenType.Assignment,
+    TokenType.OpenBracket,
+    TokenType.CloseBracket,
+    TokenType.Colon,
+    TokenType.Dot,
+    TokenType.Comma,
     TokenType.Number,
-    TokenType.String
+    TokenType.String,
+    TokenType.Identifier
 ]
-
-export type Token = {
-    Type: TokenType
-    Value: string
-}
 
 interface ITokenPatterns  {
     [s: string]: (s:string) => string | null
@@ -34,13 +27,21 @@ const regExpMatch : (s:string, r:RegExp) => string | null = (s:string, r:RegExp)
     return null
 }
 
+const letterMatch : (s:string, l:string) => string | null = (s:string, l:string) => s[0] === l ? l : null
+
 export const TokenPatterns : ITokenPatterns  = {
     [TokenType.WhiteSpace]: (s:string) => regExpMatch(s, /^(\s+)/m),
     [TokenType.Operator]: (s:string) => regExpMatch(s, /^(\+|\*|\/|%|-|==|<=|>=|<|>)/),
-    [TokenType.Assignment]: (s:string) => s[0] === '=' ? '=' : null,
+    [TokenType.Assignment]: (s:string) => letterMatch(s, '='),
+    [TokenType.OpenBracket]: (s:string) => letterMatch(s, '('),
+    [TokenType.CloseBracket]: (s:string) => letterMatch(s, ')'),
+    [TokenType.Colon]: (s:string) => letterMatch(s, ':'),
+    [TokenType.Comma]: (s:string) => letterMatch(s, ','),
+    [TokenType.Dot]: (s:string) => letterMatch(s, '.'),
     [TokenType.Comment]: (s:string) => regExpMatch(s, /^(\\.*?)\r/),
     [TokenType.Number]: (s:string) => regExpMatch(s, /^([0-9][0-9.]*)/),
-    [TokenType.String]: (s:string) => regExpMatch(s, /^(('|").*?[^\\](\2))/)
+    [TokenType.String]: (s:string) => regExpMatch(s, /^(('|").*?[^\\](\2))/),
+    [TokenType.Identifier]: (s:string) => regExpMatch(s, /^[A-Za-z_][A-Za-z0-9_]|^\[.*?\]/)
 }
 
 const GetNextToken : (input:string) => Token = (input:string) => {
@@ -59,7 +60,7 @@ const GetNextToken : (input:string) => Token = (input:string) => {
     throw new SyntaxError('Unable to parse string.')
 }
 
-export const tokenise = (input:string) => {
+const tokenise = (input:string) => {
     const tokens: Token[] = []
 
     let idx = 0
@@ -75,3 +76,5 @@ export const tokenise = (input:string) => {
 
     return tokens
 }
+
+export default tokenise

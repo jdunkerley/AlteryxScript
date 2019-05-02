@@ -1,4 +1,5 @@
-import { tokenise, TokenType, TokenPatterns, Token } from './tokeniser'
+import { TokenType } from './TokenType'
+import tokenise, { TokenPatterns } from './tokeniser'
 
 it('Can get a WhiteSpace pattern', () => {
     const pattern = TokenPatterns[TokenType.WhiteSpace]
