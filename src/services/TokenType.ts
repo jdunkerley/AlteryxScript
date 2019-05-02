@@ -4,6 +4,7 @@ export type Token = {
 }
 
 export enum TokenType {
+  NewLine = "NewLine",
   WhiteSpace = "WhiteSpace",
   Operator = "Operator",
   Assignment = "Assignment",
