@@ -2,10 +2,13 @@ import React, { useState } from 'react'
 import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
+import GridList from '@material-ui/core/GridList'
+import GridListTile from '@material-ui/core/GridListTile'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import { Token, TokenType } from '../services/TokenType'
 import tokenise from '../services/tokeniser'
+import { Toolbar, Button, Icon } from '@material-ui/core'
 
 const styles = createStyles({
   root: {
@@ -18,6 +21,9 @@ const styles = createStyles({
   textField: {
     marginLeft: '2px',
     marginRight: '2px'
+  },
+  button: {
+    margin: '2px'
   }
 })
 
@@ -62,16 +68,22 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
           </Paper>
         </Grid>
         <Grid item xs={6}>
-          <Typography variant="h6" color="inherit">
+          <Toolbar>
+            <Typography variant="h6" color="inherit" className={classes.root}>
               Tokens:
-          </Typography>
-          { codeBlock.map((token, i) => (
-            <Paper className={classes.paper}>
-              <Typography variant="title" color={token.Type === TokenType.Error ? 'error' : 'inherit'}>
-                {token.Type} : {token.Value}
-              </Typography>
-            </Paper>
-          ))}
+            </Typography>
+            <Button variant="contained" color="primary">
+              <Icon>code</Icon>&nbsp;
+              Copy as JSON
+            </Button>
+          </Toolbar>
+          <GridList cols={1} cellHeight={'auto'}>
+            { codeBlock.map((token, i) => (
+              <GridListTile key={i} style={{overflow: 'visible'}} >
+                <strong>{token.Type}</strong><pre style={{display: 'inline-block', 'padding-left': '5px'}}>{token.Value}</pre>
+              </GridListTile>
+            ))}
+          </GridList>
         </Grid>
       </Grid>
     </div>
