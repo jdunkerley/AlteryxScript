@@ -3,7 +3,6 @@ import './Nodes'
 
 const continuationTypes = [
   TokenType.OpenBracket,
-  TokenType.CloseBracket,
   TokenType.Comma,
   TokenType.Operator,
   TokenType.Dot,
@@ -30,7 +29,7 @@ export const breakToStatements : (tokens: Token[]) => Token[][] = (tokens) => {
     if (t.Type === TokenType.NewLine) {
       const prev = findLastNonComment(tokens, i, -1)
       const next = findLastNonComment(tokens, i)
-      if (!prev || !next || !(continuationTypes.indexOf(prev.Type) || continuationTypes.indexOf(next.Type))) {
+      if (!prev || !next || !(continuationTypes.indexOf(prev.Type) !== -1 || continuationTypes.indexOf(next.Type) !== -1)) {
         result.push(current)
         current = []
       }

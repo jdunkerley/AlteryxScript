@@ -34,7 +34,7 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
     try {
       const parsed:Token[] = []
 
-      if (event.target.value.match(/^\s+\[{/)) {
+      if (event.target.value.match(/^\s*\[{/)) {
         const parsedJSON: any = JSON.parse(event.target.value)
         if (!Array.isArray(parsedJSON)) {
           throw new Error('JSON is not an Array of tokens')
@@ -52,7 +52,6 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
       }
 
       setTokens(breakToStatements(parsed))
-      console.log(tokens)
     } catch (e) {
       setTokens([[{Value: `Unable to tokenise: ${e.message}`, Type: TokenType.Error}]])
     }
