@@ -1,14 +1,16 @@
 import React from 'react'
-import { withStyles, WithStyles } from '@material-ui/core/styles'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
+import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
+import Paper from '@material-ui/core/Paper'
 
-const styles = {
+const styles = createStyles({
   root: {
     flexGrow: 1
+  },
+  paper: {
+    textAlign: 'center',
+    padding: '10px'
   }
-}
+})
 
 export interface Props extends WithStyles<typeof styles> {
 }
@@ -18,13 +20,9 @@ const Home: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static" color="default">
-        <Toolbar>
-          <Typography variant="h6" color="inherit">
-            Home
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <Paper className={classes.paper}>
+
+      </Paper>
     </div>
   )
 }

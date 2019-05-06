@@ -1,32 +1,35 @@
 import React from 'react'
-import { withStyles, WithStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
+import Tabs from '@material-ui/core/Tabs'
+import Tab from '@material-ui/core/Tab'
+import { RouteComponentProps } from 'react-router'
+import { withRouter, Link } from 'react-router-dom'
 import Typography from '@material-ui/core/Typography'
+import { Toolbar } from '@material-ui/core'
 
-const styles = {
-  root: {
-    flexGrow: 1
-  }
-}
-
-export interface Props extends WithStyles<typeof styles> {
+export interface Props extends RouteComponentProps {
 }
 
 const Header: React.FC<Props> = (props: Props) => {
-  const { classes } = props
+  const { location } = props
 
   return (
-    <div className={classes.root}>
+    <div style={{flexGrow: 1}}>
       <AppBar position="static" color="default">
         <Toolbar>
-          <Typography variant="h6" color="inherit">
+          <Typography variant="h6" color="inherit" inline>
             Alteryx Script
           </Typography>
+          <div style={{flexGrow: 1}} />
+          <Tabs value={location.pathname}>
+            <Tab label="Home" component={props => <Link {...props} to="/" />} value="/" />
+            <Tab label="Tokeniser" component={props => <Link {...props} to="/tokeniser" />} value="/tokeniser" />
+            <Tab label="Parser" component={props => <Link {...props} to="/parser" />} value="/parser" />
+          </Tabs> 
         </Toolbar>
       </AppBar>
     </div>
   )
 }
 
-export default withStyles(styles)(Header)
+export default withRouter(Header)

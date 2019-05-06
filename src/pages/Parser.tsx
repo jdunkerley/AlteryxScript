@@ -5,8 +5,9 @@ import GridList from '@material-ui/core/GridList'
 import GridListTile from '@material-ui/core/GridListTile'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
-import { Token, TokenType } from '../services/TokenType'
+import { Token, TokenType, IsTokenType } from '../services/TokenType'
 import tokenise from '../services/tokeniser'
+import { breakToStatements } from '../services/parser'
 import { Toolbar, Button, Icon } from '@material-ui/core'
 
 const styles = createStyles({
@@ -27,13 +28,33 @@ export interface Props extends WithStyles<typeof styles> {
 
 const Tokeniser: React.FC<Props> = (props: Props) => {
   const { classes } = props
-  const [ tokens, setTokens ] = useState<Token[]>([])
+  const [ tokens, setTokens ] = useState<Token[][]>([])
 
   const handleOnChange = (event: any) => {
     try {
-      setTokens(tokenise(event.target.value))
-    } catch {
-      setTokens([{Value: "Unable to tokenise", Type: TokenType.Error}])
+      const parsed:Token[] = []
+
+      if (event.target.value.match(/^\s+\[{/)) {
+        const parsedJSON: any = JSON.parse(event.target.value)
+        if (!Array.isArray(parsedJSON)) {
+          throw new Error('JSON is not an Array of tokens')
+        }
+
+        parsedJSON.forEach((a:any, i:number) => {
+          if (!a.Type || !a.Value || !IsTokenType(a.Type)) {
+            throw new Error(`JSON is not a Token at index ${i}`)
+          }
+          const t:Token = { Type: a.Type, Value: a.Value }
+          parsed.push(t)
+        })
+      } else {
+        parsed.push(...tokenise(event.target.value))
+      }
+
+      setTokens(breakToStatements(parsed))
+      console.log(tokens)
+    } catch (e) {
+      setTokens([[{Value: `Unable to tokenise: ${e.message}`, Type: TokenType.Error}]])
     }
   }
 
@@ -47,7 +68,7 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
         <Grid item xs={6}>
           <TextField
             id="outlined-multiline-static"
-            label="Script Code Playpen"
+            label="Tokens as JSON"
             multiline
             rows="30"
             className={classes.textField}
@@ -60,7 +81,7 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
         <Grid item xs={6}>
           <Toolbar>
             <Typography variant="h6" color="inherit" className={classes.root}>
-              Tokens:
+              Statements:
             </Typography>
             <Button variant="contained" color="primary" onClick={copyAsJSON}>
               <Icon>code</Icon>&nbsp;
@@ -68,9 +89,13 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
             </Button>
           </Toolbar>
           <GridList cols={1} cellHeight={'auto'}>
-            { tokens.map((token, i) => (
+            { tokens.map((subTokens, i) => (
               <GridListTile key={i} style={{overflow: 'visible'}} >
-                <strong>{token.Type}</strong><pre style={{display: 'inline-block', paddingLeft: '5px'}}>{token.Value}</pre>
+                <pre style={{display: 'inline-block', paddingLeft: '5px'}}>
+                { subTokens.map((token, j) => (
+                  <abbr style={{paddingRight: '5px'}} title={token.Type} key={`${i}_${j}`}>{token.Value}</abbr>
+                ))}
+                </pre>
               </GridListTile>
             ))}
           </GridList>
