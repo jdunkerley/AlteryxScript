@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import { Token, TokenType, IsTokenType } from '../services/TokenType'
 import tokenise from '../services/tokeniser'
-import { breakToStatements } from '../services/parser'
+import { breakToStatements, mergeFunctions } from '../services/parser'
 import { Toolbar, Button, Icon } from '@material-ui/core'
 
 const styles = createStyles({
@@ -51,7 +51,9 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
         parsed.push(...tokenise(event.target.value))
       }
 
-      setTokens(breakToStatements(parsed))
+      const statements = breakToStatements(parsed)
+      const functions = statements.map(mergeFunctions)
+      setTokens(functions)
     } catch (e) {
       setTokens([[{Value: `Unable to tokenise: ${e.message}`, Type: TokenType.Error}]])
     }

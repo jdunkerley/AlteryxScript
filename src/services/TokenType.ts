@@ -17,7 +17,8 @@ export enum TokenType {
   Colon = "Colon",
   Dot = "Dot",
   Comma = "Comma",
-  Identifier = "Identifier"
+  Identifier = "Identifier",
+  Function = "Function"
 }
 
 export const IsTokenType = (s: string) => (Object.values(TokenType).filter(f => f === s).length > 0)

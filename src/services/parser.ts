@@ -44,6 +44,22 @@ export const breakToStatements : (tokens: Token[]) => Token[][] = (tokens) => {
   return result
 }
 
+export const mergeFunctions : (tokens: Token[]) => Token[] = (tokens) => {
+  const result: Token[] = []
+  tokens.filter(t => t.Type !== TokenType.WhiteSpace && t.Type !== TokenType.NewLine && t.Type !== TokenType.Comment)
+    .forEach((t, i, a) => {
+      if (t.Type === TokenType.Identifier && i + 1 < a.length && a[i + 1].Type === TokenType.OpenBracket) {
+        result.push({Type: TokenType.Function, Value: t.Value + a[i + 1].Value})
+      } else if (t.Type === TokenType.OpenBracket && i > 0 && a[i - 1].Type === TokenType.Identifier) {
+        // Do Nothing
+      } else {
+        result.push(t)
+      }
+    })
+
+  return result
+}
+
 const parser : (tokens: Token[]) => Node[] = (tokens) => {
   // Let's Join Functions
 
