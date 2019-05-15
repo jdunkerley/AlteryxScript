@@ -1,13 +1,9 @@
 import { Token, TokenType } from './TokenType'
-import './Nodes'
+import { BaseNode, TermNode } from './Nodes'
 
-const continuationTypes = [
-  TokenType.OpenBracket,
-  TokenType.Comma,
-  TokenType.Operator,
-  TokenType.Dot,
-  TokenType.Assignment
-]
+export const tokensToNodes = (tokens: Token[]) => {
+  return tokens.map(t => ({...t, Children: [] as BaseNode[], Tokens: [t]} as BaseNode))
+}
 
 const findLastNonComment = (t: Token[], i: number, d = 1) => {
   i = i + d
@@ -20,7 +16,15 @@ const findLastNonComment = (t: Token[], i: number, d = 1) => {
   return null
 }
 
-export const breakToStatements : (tokens: Token[]) => Token[][] = (tokens) => {
+export const breakToStatements = (tokens: Token[]) => {
+  const continuationTypes = [
+    TokenType.OpenBracket,
+    TokenType.Comma,
+    TokenType.Operator,
+    TokenType.Dot,
+    TokenType.Assignment
+  ]
+  
   const result: Token[][] = []
   let current : Token[] = []
 
@@ -44,7 +48,7 @@ export const breakToStatements : (tokens: Token[]) => Token[][] = (tokens) => {
   return result
 }
 
-export const mergeFunctions : (tokens: Token[]) => Token[] = (tokens) => {
+export const mergeFunctions = (tokens: Token[]) => {
   const result: Token[] = []
   tokens.filter(t => t.Type !== TokenType.WhiteSpace && t.Type !== TokenType.NewLine && t.Type !== TokenType.Comment)
     .forEach((t, i, a) => {
@@ -60,7 +64,43 @@ export const mergeFunctions : (tokens: Token[]) => Token[] = (tokens) => {
   return result
 }
 
-const parser : (tokens: Token[]) => Node[] = (tokens) => {
+export const makeTerms = (nodes: BaseNode[]) => {
+  const result: BaseNode[] = []
+
+  let currentTerm: TermNode | null = null
+  nodes.forEach((t, i, a) => {
+    if (t.Type === TokenType.OpenBracket) {
+      const newTerm = {...t, Parent: currentTerm} as TermNode
+      (currentTerm ? currentTerm.Children : result).push(newTerm)
+      currentTerm = newTerm
+    } else if (t.Type === TokenType.CloseBracket) {
+      if (!currentTerm) {
+        console.error('Mismatched Brackets')
+        throw new Error('Mismatched Brackets')
+      }
+
+      currentTerm.Value += t.Value
+      if (currentTerm.Parent) {
+        currentTerm.Parent.Tokens.push(...currentTerm.Tokens)
+        currentTerm.Parent.Value += currentTerm.Value
+      }
+      
+      const parent = currentTerm.Parent
+      currentTerm.Parent = null
+      currentTerm = parent
+    } else {
+      if (currentTerm) {
+        currentTerm.Value += t.Value
+        currentTerm.Tokens.push(...t.Tokens)
+      }
+      (currentTerm ? currentTerm.Children : result).push(t)
+    }
+  })
+
+  return result
+}
+
+const parser : (tokens: Token[]) => BaseNode[] = (tokens) => {
   // Let's Join Functions
 
   return []
