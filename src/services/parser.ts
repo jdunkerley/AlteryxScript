@@ -73,20 +73,43 @@ export const makeTerms = (nodes: BaseNode[]) => {
       const newTerm = {...t, Parent: currentTerm} as TermNode
       (currentTerm ? currentTerm.Children : result).push(newTerm)
       currentTerm = newTerm
+    } else if (t.Type === TokenType.Function) {
+      const fnTerm = {...t, Parent: currentTerm} as TermNode
+      (currentTerm ? currentTerm.Children : result).push(fnTerm)
+      const newTerm = {Type: TokenType.Argument, Value: "", Parent: fnTerm, Children: [], Tokens: []} as TermNode
+      fnTerm.Children.push(newTerm)
+      currentTerm = newTerm
+    } else if (t.Type === TokenType.Comma) {
+      if (!currentTerm || !currentTerm.Parent || currentTerm.Parent.Type !== TokenType.Function) {
+        throw new Error('Comma Not In Function')
+      }
+      currentTerm.Parent.Value += currentTerm.Value + t.Value
+      currentTerm.Parent.Tokens.push(...currentTerm.Tokens)
+      currentTerm.Parent.Tokens.push(...t.Tokens)
+      const newTerm = {Type: TokenType.Argument, Value: "", Parent: currentTerm.Parent, Children: [], Tokens: []} as TermNode
+      currentTerm.Parent.Children.push(newTerm)
+      currentTerm.Parent = null
+      currentTerm = newTerm
     } else if (t.Type === TokenType.CloseBracket) {
       if (!currentTerm) {
-        console.error('Mismatched Brackets')
         throw new Error('Mismatched Brackets')
       }
 
-      currentTerm.Value += t.Value
-      if (currentTerm.Parent) {
+      let parent : TermNode | null
+      if (currentTerm.Parent && currentTerm.Parent.Type === TokenType.Function) {
+        parent = currentTerm.Parent.Parent
+        currentTerm.Parent.Value += currentTerm.Value + t.Value
         currentTerm.Parent.Tokens.push(...currentTerm.Tokens)
-        currentTerm.Parent.Value += currentTerm.Value
+        currentTerm.Parent.Tokens.push(...t.Tokens)
+        currentTerm.Parent.Parent = null
+        currentTerm.Parent = null
+      } else {
+        parent = currentTerm.Parent
+        currentTerm.Value += t.Value
+        currentTerm.Tokens.push(...t.Tokens)
+        currentTerm.Parent = null
       }
-      
-      const parent = currentTerm.Parent
-      currentTerm.Parent = null
+
       currentTerm = parent
     } else {
       if (currentTerm) {
@@ -96,6 +119,11 @@ export const makeTerms = (nodes: BaseNode[]) => {
       (currentTerm ? currentTerm.Children : result).push(t)
     }
   })
+
+  if (currentTerm) {
+    console.log(result)
+    throw new Error('Unclosed Brackets')
+  }
 
   return result
 }
