@@ -11,15 +11,16 @@ export enum TokenType {
   Comment = "Comment",
   Number = "Number",
   String = "String",
-  Error = "Error",
   OpenBracket = "OpenBracket",
   CloseBracket = "CloseBracket",
   Colon = "Colon",
   Dot = "Dot",
   Comma = "Comma",
   Identifier = "Identifier",
+  UnaryOperator = "UnaryOperator",
   Function = "Function",
-  Argument = "Arguement"
+  Argument = "Argument",
+  Error = "Error"
 }
 
 export const IsTokenType = (s: string) => (Object.values(TokenType).filter(f => f === s).length > 0)

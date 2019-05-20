@@ -1,11 +1,7 @@
 import { Token, TokenType } from './TokenType'
 import { BaseNode, TermNode } from './Nodes'
 
-export const tokensToNodes = (tokens: Token[]) => {
-  return tokens.map(t => ({...t, Children: [] as BaseNode[], Tokens: [t]} as BaseNode))
-}
-
-const findLastNonComment = (t: Token[], i: number, d = 1) => {
+function findLastNonComment(t: Token[], i: number, d = 1) {
   i = i + d
   while (i < t.length && i >= 0) {
     if (t[i].Type !== TokenType.Comment && t[i].Type !== TokenType.NewLine) {
@@ -48,75 +44,79 @@ export const breakToStatements = (tokens: Token[]) => {
   return result
 }
 
-export const mergeFunctions = (tokens: Token[]) => {
-  const result: Token[] = []
-  tokens.filter(t => t.Type !== TokenType.WhiteSpace && t.Type !== TokenType.NewLine && t.Type !== TokenType.Comment)
-    .forEach((t, i, a) => {
-      if (t.Type === TokenType.Identifier && i + 1 < a.length && a[i + 1].Type === TokenType.OpenBracket) {
-        result.push({Type: TokenType.Function, Value: t.Value + a[i + 1].Value})
-      } else if (t.Type === TokenType.OpenBracket && i > 0 && a[i - 1].Type === TokenType.Identifier) {
-        // Do Nothing
-      } else {
-        result.push(t)
-      }
-    })
-
-  return result
-}
-
 export const makeTerms = (nodes: BaseNode[]) => {
   const result: BaseNode[] = []
-
   let currentTerm: TermNode | null = null
-  nodes.forEach((t, i, a) => {
+
+  const openLayer = (node: BaseNode) => {
+    const newTerm = {...node, Parent: currentTerm} as TermNode
+    (currentTerm ? currentTerm.Children : result).push(newTerm)
+    currentTerm = newTerm
+  }
+
+  const isFunction = () => (currentTerm && currentTerm.Parent && currentTerm.Parent.Type === TokenType.Function)
+
+  const pushNode = (t: BaseNode) => {
+    if (currentTerm) {
+      currentTerm.Value += t.Value
+      currentTerm.Tokens.push(...t.Tokens)
+    }
+  }
+
+  const closeLayer = () => {
+    if (!currentTerm) {
+      throw new Error('Not in a term')
+    }
+
+    const parent = currentTerm.Parent
+    currentTerm.Parent = null
+    currentTerm = parent
+  }
+
+  const closeArgument = () => {
+    if (!currentTerm || !currentTerm.Parent) {
+      throw new Error('Not in an argument of a function')
+    }
+
+    if (currentTerm.Children.length >= 2 && currentTerm.Children[0].Type === TokenType.Identifier && currentTerm.Children[1].Type === TokenType.Colon) {
+      currentTerm.Identifier = currentTerm.Children[0].Value
+      currentTerm.IdentifierNode = currentTerm.Children[0]
+      currentTerm.Children.shift()
+      currentTerm.Children.shift()
+    }
+
+    currentTerm.Parent.Value += currentTerm.Value
+    currentTerm.Parent.Tokens.push(...currentTerm.Tokens)
+    closeLayer()
+  }
+
+  nodes.forEach((t) => {
     if (t.Type === TokenType.OpenBracket) {
-      const newTerm = {...t, Parent: currentTerm} as TermNode
-      (currentTerm ? currentTerm.Children : result).push(newTerm)
-      currentTerm = newTerm
+      openLayer(t)
     } else if (t.Type === TokenType.Function) {
-      const fnTerm = {...t, Parent: currentTerm} as TermNode
-      (currentTerm ? currentTerm.Children : result).push(fnTerm)
-      const newTerm = {Type: TokenType.Argument, Value: "", Parent: fnTerm, Children: [], Tokens: []} as TermNode
-      fnTerm.Children.push(newTerm)
-      currentTerm = newTerm
+      openLayer(t)
+      openLayer({Type: TokenType.Argument, Value: "", Children: [], Tokens: []})
     } else if (t.Type === TokenType.Comma) {
-      if (!currentTerm || !currentTerm.Parent || currentTerm.Parent.Type !== TokenType.Function) {
-        throw new Error('Comma Not In Function')
+      if (!isFunction()) {
+        throw new Error('Comma Used Not In Function')
       }
-      currentTerm.Parent.Value += currentTerm.Value + t.Value
-      currentTerm.Parent.Tokens.push(...currentTerm.Tokens)
-      currentTerm.Parent.Tokens.push(...t.Tokens)
-      const newTerm = {Type: TokenType.Argument, Value: "", Parent: currentTerm.Parent, Children: [], Tokens: []} as TermNode
-      currentTerm.Parent.Children.push(newTerm)
-      currentTerm.Parent = null
-      currentTerm = newTerm
+
+      closeArgument()
+      pushNode(t)
+      openLayer({Type: TokenType.Argument, Value: "", Children: [], Tokens: []})
     } else if (t.Type === TokenType.CloseBracket) {
       if (!currentTerm) {
         throw new Error('Mismatched Brackets')
       }
 
-      let parent : TermNode | null
-      if (currentTerm.Parent && currentTerm.Parent.Type === TokenType.Function) {
-        parent = currentTerm.Parent.Parent
-        currentTerm.Parent.Value += currentTerm.Value + t.Value
-        currentTerm.Parent.Tokens.push(...currentTerm.Tokens)
-        currentTerm.Parent.Tokens.push(...t.Tokens)
-        currentTerm.Parent.Parent = null
-        currentTerm.Parent = null
-      } else {
-        parent = currentTerm.Parent
-        currentTerm.Value += t.Value
-        currentTerm.Tokens.push(...t.Tokens)
-        currentTerm.Parent = null
+      if (isFunction()) {
+        closeArgument()
       }
-
-      currentTerm = parent
+      pushNode(t)
+      closeLayer()
     } else {
-      if (currentTerm) {
-        currentTerm.Value += t.Value
-        currentTerm.Tokens.push(...t.Tokens)
-      }
       (currentTerm ? currentTerm.Children : result).push(t)
+      pushNode(t)
     }
   })
 
@@ -127,11 +127,3 @@ export const makeTerms = (nodes: BaseNode[]) => {
 
   return result
 }
-
-const parser : (tokens: Token[]) => BaseNode[] = (tokens) => {
-  // Let's Join Functions
-
-  return []
-}
-
-export default parser

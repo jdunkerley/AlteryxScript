@@ -6,9 +6,9 @@ import GridListTile from '@material-ui/core/GridListTile'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import { Token, TokenType, IsTokenType } from '../services/TokenType'
-import { BaseNode } from '../services/Nodes'
+import { BaseNode, tokensToNodes } from '../services/Nodes'
 import tokenise from '../services/tokeniser'
-import { breakToStatements, mergeFunctions, tokensToNodes, makeTerms } from '../services/parser'
+import { breakToStatements, makeTerms } from '../services/parser'
 import { Toolbar, Button, Icon } from '@material-ui/core'
 
 const styles = createStyles({
@@ -35,6 +35,8 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
     try {
       const parsed:Token[] = []
 
+      window.localStorage.setItem('parserRaw', event.target.value)
+
       if (event.target.value.match(/^\s*\[{/)) {
         const parsedJSON: any = JSON.parse(event.target.value)
         if (!Array.isArray(parsedJSON)) {
@@ -53,7 +55,7 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
       }
 
       const statements = breakToStatements(parsed)
-      const functions = statements.map(mergeFunctions).map(tokensToNodes).map(makeTerms)
+      const functions = statements.map(tokensToNodes).map(makeTerms)
       setTokens(functions)
     } catch (e) {
       setTokens([[{Value: `Unable to tokenise: ${e.message}`, Type: TokenType.Error, Children: [] as BaseNode[], Tokens: [] as Token[]}]])
@@ -78,6 +80,7 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
             variant="outlined"
             fullWidth
             onChange={handleOnChange}
+            value={window.localStorage.getItem('parserRaw') || ''}
           />
         </Grid>
         <Grid item xs={6}>

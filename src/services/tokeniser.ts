@@ -40,7 +40,7 @@ export const TokenPatterns: ITokenPatterns = {
   [TokenType.Colon]: (s) => letterMatch(s, ':'),
   [TokenType.Comma]: (s) => letterMatch(s, ','),
   [TokenType.Dot]: (s) => letterMatch(s, '.'),
-  [TokenType.Comment]: (s) => regExpMatch(s, /^(\\.*?)\r?\n/),
+  [TokenType.Comment]: (s) => regExpMatch(s, /^(\/\/.*?)\r?\n/),
   [TokenType.Number]: (s) => regExpMatch(s, /^([0-9][0-9.]*)/),
   [TokenType.String]: (s) => regExpMatch(s, /^(('|").*?[^\\](\2))/),
   [TokenType.Identifier]: (s) => regExpMatch(s, /^([A-Za-z_][A-Za-z0-9_]*|\[.*?\])/)
@@ -62,6 +62,23 @@ const GetNextToken: (input: string) => Token = (input) => {
   throw new SyntaxError('Unable to parse string.')
 }
 
+
+const mergeFunctions = (tokens: Token[]) => {
+  const result: Token[] = []
+  tokens.filter(t => t.Type !== TokenType.WhiteSpace && t.Type !== TokenType.NewLine && t.Type !== TokenType.Comment)
+    .forEach((t, i, a) => {
+      if (t.Type === TokenType.Identifier && i + 1 < a.length && a[i + 1].Type === TokenType.OpenBracket) {
+        result.push({Type: TokenType.Function, Value: t.Value + a[i + 1].Value})
+      } else if (t.Type === TokenType.OpenBracket && i > 0 && a[i - 1].Type === TokenType.Identifier) {
+        // Do Nothing
+      } else {
+        result.push(t)
+      }
+    })
+
+  return result
+}
+
 const tokenise = (input: string) => {
   const tokens: Token[] = []
 
@@ -76,7 +93,7 @@ const tokenise = (input: string) => {
     }
   }
 
-  return tokens
+  return mergeFunctions(tokens)
 }
 
 export default tokenise
