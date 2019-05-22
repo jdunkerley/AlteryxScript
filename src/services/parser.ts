@@ -64,14 +64,13 @@ function mergeDots(nodes: BaseNode[]) {
             Children: [prev],
             Parent: prev as TermNode
           } as TermNode)
-          next.Value = next.Value.replace(/^(.*?\().*$/, '$1') + prev.Value + ',' + next.Value.replace(/^(.*?\()(.*)$/, '$2')
         }
       } else if (next.Type === TokenType.Identifier) {
         const prev = result.pop()
         if (prev) {
           result.push({
             Type: TokenType.Property, 
-            Value: `${prev.Value}.${next.Value}`, 
+            Value: `.${next.Value}`, 
             Children: [prev], 
             Identifier: next.Value,
             IdentifierNode: next
@@ -130,12 +129,6 @@ export const makeTerms = (nodes: BaseNode[]) => {
 
   const isFunction = () => (currentTerm && currentTerm.Parent && currentTerm.Parent.Type === TokenType.Function)
 
-  const pushNode = (t: BaseNode) => {
-    if (currentTerm) {
-      currentTerm.Value += t.Value
-    }
-  }
-
   const closeLayer = () => {
     if (!currentTerm) {
       throw new Error('Not in a term')
@@ -152,7 +145,6 @@ export const makeTerms = (nodes: BaseNode[]) => {
       throw new Error('Not in an argument of a function')
     }
 
-    currentTerm.Parent.Value += currentTerm.Value
     closeLayer()
   }
 
@@ -168,7 +160,6 @@ export const makeTerms = (nodes: BaseNode[]) => {
       }
 
       closeArgument()
-      pushNode(t)
       openLayer({Type: TokenType.Argument, Value: "", Children: []})
     } else if (t.Type === TokenType.Colon) {
       if (!isFunction()) {
@@ -182,7 +173,6 @@ export const makeTerms = (nodes: BaseNode[]) => {
       currentTerm.Identifier = currentTerm.Children[0].Value
       currentTerm.IdentifierNode = currentTerm.Children[0]
       currentTerm.Children.shift()
-      pushNode(t)
     } else if (t.Type === TokenType.CloseBracket) {
       if (!currentTerm) {
         throw new Error('Mismatched Brackets')
@@ -192,11 +182,9 @@ export const makeTerms = (nodes: BaseNode[]) => {
         closeArgument()
       }
 
-      pushNode(t)
       closeLayer()
     } else {
       (currentTerm ? currentTerm.Children : result).push(t)
-      pushNode(t)
     }
   })
 

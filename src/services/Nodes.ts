@@ -4,6 +4,13 @@ export const tokensToNodes = (tokens: Token[]) => {
   return tokens.map(t => ({...t, Children: [] as BaseNode[]} as BaseNode))
 }
 
+export const nodeValue : (n:BaseNode) => string = (node) => {
+  return node.Children.reduce(
+      (p, c, i) => p + (i > 0 ? (node.Type === TokenType.Function ? ',' : ' ') : '') + nodeValue(c),
+      node.Value
+    ) + (node.Type === TokenType.Function || node.Type === TokenType.OpenBracket ? ')' : '')
+}
+
 export interface BaseNode {
   Type: TokenType,
   Value: string,
