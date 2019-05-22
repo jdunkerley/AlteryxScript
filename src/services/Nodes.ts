@@ -1,12 +1,13 @@
 import { Token, TokenType } from './TokenType'
 
 export const tokensToNodes = (tokens: Token[]) => {
-  return tokens.map(t => ({...t, Children: [] as BaseNode[], Tokens: [t]} as BaseNode))
+  return tokens.map(t => ({...t, Children: [] as BaseNode[]} as BaseNode))
 }
 
-export interface BaseNode extends Token {
-  Children: BaseNode[],
-  Tokens: Token[]
+export interface BaseNode {
+  Type: TokenType,
+  Value: string,
+  Children: BaseNode[]
 }
 
 export interface TermNode extends BaseNode {
@@ -15,8 +16,8 @@ export interface TermNode extends BaseNode {
   IdentifierNode?: BaseNode
 }
 
-export interface AssignmentNode extends BaseNode {
-  Type: TokenType.Assignment,
+export interface IdentifierNode extends BaseNode {
+  Type: TokenType.Assignment | TokenType.Property
   Identifier: string
   IdentifierNode: BaseNode
 }

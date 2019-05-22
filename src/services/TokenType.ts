@@ -6,20 +6,21 @@ export type Token = {
 export enum TokenType {
   NewLine = "NewLine",
   WhiteSpace = "WhiteSpace",
-  Operator = "Operator",
-  Assignment = "Assignment",
+  Operator = "Operator", // Not Handled in Parser
+  Assignment = "Assignment", // Not Handled in Parser
   Comment = "Comment",
   Number = "Number",
   String = "String",
   OpenBracket = "OpenBracket",
   CloseBracket = "CloseBracket",
   Colon = "Colon",
-  Dot = "Dot",
+  Dot = "Dot", // Not Handled in Parser
   Comma = "Comma",
   Identifier = "Identifier",
   UnaryOperator = "UnaryOperator",
   Function = "Function",
   Argument = "Argument",
+  Property = "Property",
   Error = "Error"
 }
 
