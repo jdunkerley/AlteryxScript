@@ -156,6 +156,7 @@ export const makeTerms = (nodes: BaseNode[]) => {
       openLayer({Type: TokenType.Argument, Value: "", Children: []})
     } else if (t.Type === TokenType.Comma) {
       if (!isFunction()) {
+        console.log(nodes, currentTerm)
         throw new Error('Comma Used Not In Function')
       }
 

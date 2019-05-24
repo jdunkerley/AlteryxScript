@@ -62,14 +62,15 @@ const GetNextToken: (input: string) => Token = (input) => {
   throw new SyntaxError('Unable to parse string.')
 }
 
-
-const mergeFunctions = (tokens: Token[]) => {
+export const mergeFunctions = (tokens: Token[]) => {
   const result: Token[] = []
+
   tokens.filter(t => t.Type !== TokenType.WhiteSpace && t.Type !== TokenType.NewLine && t.Type !== TokenType.Comment)
     .forEach((t, i, a) => {
       if (t.Type === TokenType.Identifier && i + 1 < a.length && a[i + 1].Type === TokenType.OpenBracket) {
+        t.Type = TokenType.Function
         result.push({Type: TokenType.Function, Value: t.Value + a[i + 1].Value})
-      } else if (t.Type === TokenType.OpenBracket && i > 0 && a[i - 1].Type === TokenType.Identifier) {
+      } else if (t.Type === TokenType.OpenBracket && i > 0 && a[i - 1].Type === TokenType.Function) {
         // Do Nothing
       } else {
         result.push(t)
@@ -93,7 +94,7 @@ const tokenise = (input: string) => {
     }
   }
 
-  return mergeFunctions(tokens)
+  return tokens
 }
 
 export default tokenise

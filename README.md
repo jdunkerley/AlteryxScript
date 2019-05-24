@@ -25,3 +25,20 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
+
+## Parsing Process
+
+1. Input text into list of Tokens
+2. Split into statements
+3. Merge functions
+4. Identify Unary / Binary Operators
+5. Convert to Nodes
+6. Identify terms
+  - Fold Dots into function or assignment
+  - Within a term:
+  a. Assignment
+  b. Unary operators (+ / - / !)
+  c. Binary operators ()
+  - Must become a single node otherwise not valid statement
+
+- Initial version will not handle comment folding
