@@ -33,7 +33,7 @@ const letterMatch: (s: string, l: string) => string | null = (s, l) => s[0] === 
 export const TokenPatterns: ITokenPatterns = {
   [TokenType.NewLine]: (s) => regExpMatch(s, /^(\r?\n(\s+\n)?)/),
   [TokenType.WhiteSpace]: (s) => regExpMatch(s, /^([ \t]+)/),
-  [TokenType.Operator]: (s) => regExpMatch(s, /^(\+|\*|\/|%|-|==|<=|>=|<|>)/),
+  [TokenType.Operator]: (s) => regExpMatch(s, /^(\+|\*|\/|%|-|==|!=|<=|>=|<|>)/),
   [TokenType.Assignment]: (s) => letterMatch(s, '='),
   [TokenType.OpenBracket]: (s) => letterMatch(s, '('),
   [TokenType.CloseBracket]: (s) => letterMatch(s, ')'),

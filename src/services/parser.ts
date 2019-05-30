@@ -1,5 +1,5 @@
 import { Token, TokenType } from './TokenType'
-import { BaseNode, TermNode, IdentifierNode } from './Nodes'
+import { BaseNode, TermNode, FunctionNode, AssignmentNode } from './Nodes'
 
 function findLastNonComment(t: Token[], i: number, d = 1) {
   i = i + d
@@ -58,23 +58,12 @@ function mergeDots(nodes: BaseNode[]) {
       if (next.Type === TokenType.Function) {
         const prev = result.pop()
         if (prev) {
-          next.Children.unshift({
-            Type: TokenType.Argument,
-            Value: prev.Value,
-            Children: [prev],
-            Parent: prev as TermNode
-          } as TermNode)
+          next.Children.unshift(new TermNode(TokenType.Argument, prev.Value, [prev]))
         }
       } else if (next.Type === TokenType.Identifier) {
         const prev = result.pop()
         if (prev) {
-          result.push({
-            Type: TokenType.Property, 
-            Value: `.${next.Value}`, 
-            Children: [prev], 
-            Identifier: next.Value,
-            IdentifierNode: next
-          } as IdentifierNode)
+          result.push(new TermNode(TokenType.Property, '.', [prev], next))
         }
         skipOne = true
       } else {
@@ -102,46 +91,101 @@ function handleAssignment(nodes: BaseNode[]) {
 
   const children: BaseNode[] = singleTermParser(nodes.slice(2))
 
-  return [{
-    Type: TokenType.Assignment, 
-    Value: nodes[0].Value + nodes[1].Value,
-    Children: children,
-    Identifier: nodes[0].Value,
-    IdentifierNode: nodes[0]
-  } as IdentifierNode] as BaseNode[]
+  return [new AssignmentNode(children, nodes[0])]
+}
+
+function identifyUnaryOperators(nodes: BaseNode[]) {
+  if (!nodes.filter(n => n.Type === TokenType.Operator).length) {
+    return nodes
+  }
+
+  // If First token or and operator before hand
+  const result: BaseNode[] = []
+  nodes.forEach((n, i) => {
+    if (n.Type === TokenType.Operator) {
+      result.push(
+        new BaseNode(
+          (i === 0 || nodes[i-1].Type === TokenType.Operator) ? TokenType.UnaryOperator : TokenType.BinaryOperator,
+          n.Value,
+          n.Children
+        )
+      )
+    } else {
+      result.push(n)
+    }
+  })
+  return result
+}
+
+function handleUnaryOperators(nodes: BaseNode[]) {
+  const first = nodes.findIndex(n => n.Type === TokenType.UnaryOperator)
+  if (first === -1) {
+    return nodes
+  }
+
+  const newNode : BaseNode = new BaseNode(nodes[first].Type, nodes[first].Value, singleTermParser(nodes.slice(first + 1)))
+  const result = [...nodes.slice(0, first), newNode]
+  console.log(nodes.map(n=>n.Type), result.map(n=>n.Type), newNode)
+  return result
+}
+
+function handleBinaryOperators(nodes: BaseNode[], operators: string[]) {
+  const first = nodes.findIndex(n => n.Type === TokenType.BinaryOperator && operators.indexOf(n.Value) !== -1)
+  if (first === -1) {
+    return nodes
+  }
+
+  const left = singleTermParser(nodes.slice(0, first))
+  const right = singleTermParser(nodes.slice(first + 1))
+  return [new BaseNode(nodes[first].Type, nodes[first].Value, [
+    left.length === 1 ? left[0] : new TermNode(TokenType.Argument, '', left), 
+    right.length === 1 ? right[0] : new TermNode(TokenType.Argument, '', right)
+  ])]
 }
 
 export const singleTermParser = (nodes: BaseNode[]) => {
   // First merge dots
-  const merged = mergeDots(nodes)
-  return handleAssignment(merged)
+  let result = mergeDots(nodes)
+  result = handleAssignment(result)
+
+  // Binary Operators in Order ...
+  result = handleBinaryOperators(result, ['*', '/', '%'])
+  result = handleBinaryOperators(result, ['+', '-'])
+  result = handleBinaryOperators(result, ['<', '>', '<=', '>='])
+  result = handleBinaryOperators(result, ['==', '!='])
+
+  result = handleUnaryOperators(identifyUnaryOperators(result))
+
+  if (result.length > 1) {
+    console.log("Non Singular", nodes, result)
+  }
+  return result
 }
 
 export const makeTerms = (nodes: BaseNode[]) => {
   const result: BaseNode[] = []
-  let currentTerm: TermNode | null = null
+  let currentNodes: (TermNode | FunctionNode)[] = []
 
-  const openLayer = (node: BaseNode) => {
-    const newTerm = {...node, Parent: currentTerm} as TermNode
-    (currentTerm ? currentTerm.Children : result).push(newTerm)
-    currentTerm = newTerm
+  const openLayer = (node: TermNode | FunctionNode) => {
+    (currentNodes.length ? currentNodes[0].Children : result).push(node)
+    currentNodes.unshift(node)
   }
 
-  const isFunction = () => (currentTerm && currentTerm.Parent && currentTerm.Parent.Type === TokenType.Function)
+  const isFunction = () => (currentNodes.length > 1 && currentNodes[1].Type === TokenType.Function)
 
   const closeLayer = () => {
-    if (!currentTerm) {
+    if (!currentNodes.length) {
       throw new Error('Not in a term')
     }
 
-    const parent = currentTerm.Parent
-    currentTerm.Parent = null
-    currentTerm.Children = singleTermParser(currentTerm.Children)
-    currentTerm = parent
+    if (currentNodes[0].Type !== TokenType.Function) {
+      currentNodes[0].Children = singleTermParser(currentNodes[0].Children)
+    }
+    currentNodes.shift()
   }
 
   const closeArgument = () => {
-    if (!currentTerm || !currentTerm.Parent) {
+    if (!isFunction) {
       throw new Error('Not in an argument of a function')
     }
 
@@ -150,32 +194,30 @@ export const makeTerms = (nodes: BaseNode[]) => {
 
   nodes.forEach((t) => {
     if (t.Type === TokenType.OpenBracket) {
-      openLayer(t)
+      openLayer(new TermNode(TokenType.OpenBracket, '', []))
     } else if (t.Type === TokenType.Function) {
-      openLayer(t)
-      openLayer({Type: TokenType.Argument, Value: "", Children: []})
+      openLayer(new FunctionNode(t.Value, []))
+      openLayer(new TermNode(TokenType.Argument, '', []))
     } else if (t.Type === TokenType.Comma) {
       if (!isFunction()) {
-        console.log(nodes, currentTerm)
+        console.log(nodes, currentNodes)
         throw new Error('Comma Used Not In Function')
       }
 
       closeArgument()
-      openLayer({Type: TokenType.Argument, Value: "", Children: []})
+      openLayer(new TermNode(TokenType.Argument, '', []))
     } else if (t.Type === TokenType.Colon) {
       if (!isFunction()) {
         throw new Error('Colon Used Not In Function')
       }
 
-      if (!currentTerm || currentTerm.Children.length !== 1 || currentTerm.Children[0].Type !== TokenType.Identifier) {
+      if (!currentNodes.length || currentNodes[0].Children.length !== 1 || currentNodes[0].Children[0].Type !== TokenType.Identifier) {
         throw new Error('Colon Not Used For Argument Idenifier')
       }
 
-      currentTerm.Identifier = currentTerm.Children[0].Value
-      currentTerm.IdentifierNode = currentTerm.Children[0]
-      currentTerm.Children.shift()
+      currentNodes[0] = new TermNode(currentNodes[0].Type, currentNodes[0].Value, [], currentNodes[0].Children[0])
     } else if (t.Type === TokenType.CloseBracket) {
-      if (!currentTerm) {
+      if (!currentNodes) {
         throw new Error('Mismatched Brackets')
       }
 
@@ -185,11 +227,11 @@ export const makeTerms = (nodes: BaseNode[]) => {
 
       closeLayer()
     } else {
-      (currentTerm ? currentTerm.Children : result).push(t)
+      (currentNodes.length ? currentNodes[0].Children : result).push(t)
     }
   })
 
-  if (currentTerm) {
+  if (currentNodes.length) {
     throw new Error('Unclosed Brackets')
   }
 

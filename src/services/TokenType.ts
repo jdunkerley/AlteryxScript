@@ -18,6 +18,7 @@ export enum TokenType {
   Comma = "Comma",
   Identifier = "Identifier",
   UnaryOperator = "UnaryOperator",
+  BinaryOperator = "BinaryOperator",
   Function = "Function",
   Argument = "Argument",
   Property = "Property",

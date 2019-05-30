@@ -6,7 +6,7 @@ import GridListTile from '@material-ui/core/GridListTile'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import { Token, TokenType, IsTokenType } from '../services/TokenType'
-import { BaseNode, tokensToNodes, nodeValue } from '../services/Nodes'
+import { BaseNode, tokensToNodes } from '../services/Nodes'
 import tokenise, { mergeFunctions } from '../services/tokeniser'
 import { breakToStatements, makeTerms } from '../services/parser'
 import { Toolbar, Button, Icon } from '@material-ui/core'
@@ -55,11 +55,11 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
       }
 
       const statements = breakToStatements(parsed).map(mergeFunctions)
-      console.log(statements)
       const functions = statements.map(tokensToNodes).map(makeTerms)
+      console.log(statements, functions)
       setTokens(functions)
     } catch (e) {
-      setTokens([[{Value: `Unable to tokenise: ${e.message}`, Type: TokenType.Error, Children: [] as BaseNode[]}]])
+      setTokens([[new BaseNode(TokenType.Error, `Unable to tokenise: ${e.message}`)]])
     }
   }
 
@@ -99,7 +99,7 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
               <GridListTile key={i} style={{overflow: 'visible'}} >
                 <pre style={{display: 'inline-block', paddingLeft: '5px'}}>
                 { subTokens.map((token, j) => (
-                  <abbr style={{paddingRight: '5px'}} title={token.Type} key={`${i}_${j}`}>{nodeValue(token)}</abbr>
+                  <abbr style={{paddingRight: '5px'}} title={token.Type} key={`${i}_${j}`}>{token.NodeValue}</abbr>
                 ))}
                 </pre>
               </GridListTile>
