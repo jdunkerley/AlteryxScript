@@ -125,7 +125,6 @@ function handleUnaryOperators(nodes: BaseNode[]) {
 
   const newNode : BaseNode = new BaseNode(nodes[first].Type, nodes[first].Value, singleTermParser(nodes.slice(first + 1)))
   const result = [...nodes.slice(0, first), newNode]
-  console.log(nodes.map(n=>n.Type), result.map(n=>n.Type), newNode)
   return result
 }
 
@@ -157,7 +156,7 @@ export const singleTermParser = (nodes: BaseNode[]) => {
   result = handleUnaryOperators(identifyUnaryOperators(result))
 
   if (result.length > 1) {
-    console.log("Non Singular", nodes, result)
+    console.error("Non Singular", nodes, result)
   }
   return result
 }
@@ -200,7 +199,6 @@ export const makeTerms = (nodes: BaseNode[]) => {
       openLayer(new TermNode(TokenType.Argument, '', []))
     } else if (t.Type === TokenType.Comma) {
       if (!isFunction()) {
-        console.log(nodes, currentNodes)
         throw new Error('Comma Used Not In Function')
       }
 

@@ -56,7 +56,6 @@ const Tokeniser: React.FC<Props> = (props: Props) => {
 
       const statements = breakToStatements(parsed).map(mergeFunctions)
       const functions = statements.map(tokensToNodes).map(makeTerms)
-      console.log(statements, functions)
       setTokens(functions)
     } catch (e) {
       setTokens([[new BaseNode(TokenType.Error, `Unable to tokenise: ${e.message}`)]])
