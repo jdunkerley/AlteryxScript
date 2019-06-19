@@ -1,5 +1,6 @@
 import { Token, TokenType } from './TokenType'
-import { BaseNode, TermNode, FunctionNode, AssignmentNode } from './Nodes'
+import { BaseNode, TermNode, FunctionNode, AssignmentNode, tokensToNodes } from '../services/Nodes'
+import tokenise, { mergeFunctions } from '../services/tokeniser'
 
 function findLastNonComment(t: Token[], i: number, d = 1) {
   i = i + d
@@ -234,4 +235,11 @@ export const makeTerms = (nodes: BaseNode[]) => {
   }
 
   return singleTermParser(result)
+}
+
+export default (value: string) => {
+  const parsed:Token[] = []
+  parsed.push(...tokenise(value))
+  const statements = breakToStatements(parsed).map(mergeFunctions)
+  return statements.map(tokensToNodes).map(makeTerms)
 }
