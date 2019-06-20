@@ -18,6 +18,12 @@ export default (node:BaseNode, evaluator: Evaluator) => {
       return BinaryMathOperator(node, evaluator, '/', 'Divide')
     case '**':
       return BinaryMathOperator(node, evaluator, '**', 'Exponential')
+    case '&':
+      return BinaryMathOperator(node, evaluator, '&', 'BitwiseAnd')
+    case '^':
+      return BinaryMathOperator(node, evaluator, '^', 'BitwiseXor')
+    case '|':
+      return BinaryMathOperator(node, evaluator, '|', 'BitwiseOr')
     case '==':
       return BinaryComparison(node, evaluator, node.Value, 'Equality')
     case '!=':
