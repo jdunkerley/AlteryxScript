@@ -3,6 +3,7 @@ import { TokenType } from "./TokenType"
 import Assignment from "./Operators/Assignment"
 import Unary from "./Operators/Unary"
 import Binary from "./Operators/Binary"
+import Func from "./Functions/Function"
 
 const XMLHeader = `<?xml version="1.0"?>
 <AlteryxDocument yxmdVer="2019.1">
@@ -26,7 +27,7 @@ const XMLFooter = `
 </AlteryxDocument>
 `
 
-class AlteryxNode {
+export class AlteryxNode {
   readonly nodeId: number
   readonly plugin: string
   readonly engineDll: string
@@ -76,7 +77,7 @@ class AlteryxConnection {
   }
 }
 
-type VariableType = string | number | boolean | AlteryxNode 
+export type VariableType = string | number | boolean | AlteryxNode 
 
 export class Evaluator {
   nextNodeId: number = 1
@@ -136,37 +137,9 @@ ${n.xmlConfig}
       case TokenType.BinaryOperator:
         return Binary(node, this)
       case TokenType.Function:
-        if (node.Value === 'Input(') {
-          return this.addNode('AlteryxBasePluginsGui.DbFileInput.DbFileInput', 'AlteryxBasePluginsEngine.dll' ,'AlteryxDbFileInput', `
-          <Passwords />
-          <File OutputFileName="" RecordLimit="" SearchSubDirs="False" FileFormat="0">C:\\temp\\Encoding Time.csv</File>
-          <FormatSpecificOptions>
-            <CodePage>28591</CodePage>
-            <Delimeter>,</Delimeter>
-            <IgnoreErrors>False</IgnoreErrors>
-            <FieldLen>254</FieldLen>
-            <AllowShareWrite>False</AllowShareWrite>
-            <HeaderRow>True</HeaderRow>
-            <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
-            <ImportLine>1</ImportLine>
-          </FormatSpecificOptions>
-`, 'Output', ['Output'])
-        } else if (node.Value === 'Output(') {
-          const node = this.addNode('AlteryxBasePluginsGui.DbFileInput.DbFileOutput', 'AlteryxBasePluginsEngine.dll' ,'AlteryxDbFileOutput', `
-          <File FileFormat="54" MaxRecords="">C:\\temp\\Test.json</File>
-          <Passwords />
-          <FormatSpecificOptions>
-            <CodePage>28591</CodePage>
-          </FormatSpecificOptions>
-          <MultiFile value="False" />
-`, '', [])
-          this.addConnection(1, 'Input', 2, 'Output')
-          return node
-        }
-        throw new SyntaxError("Failed to evaluate node")
-      // Binary Operators
-      // Functions
+        return Func(node, this)
       default:
+        console.error(node)
         throw new SyntaxError("Failed to evaluate node")
     }
   }

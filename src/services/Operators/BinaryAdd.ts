@@ -14,7 +14,6 @@ export default (node:BaseNode, evaluator: Evaluator) => {
   }
 
   if (left as string || right as string) {
-    console.log("String Concat")
     return String(left) + String(right)
   }
 

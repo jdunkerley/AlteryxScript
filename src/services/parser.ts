@@ -225,6 +225,8 @@ export const makeTerms = (nodes: BaseNode[]) => {
       }
 
       currentNodes[0] = new TermNode(currentNodes[0].Type, currentNodes[0].Value, [], currentNodes[0].Children[0])
+      currentNodes[1].Children.pop()
+      currentNodes[1].Children.push(currentNodes[0])
     } else if (t.Type === TokenType.CloseBracket) {
       if (!currentNodes) {
         throw new Error('Mismatched Brackets')

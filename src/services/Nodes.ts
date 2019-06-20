@@ -52,6 +52,11 @@ export class FunctionNode extends BaseNode {
   get NodeValue(): string {
     return this.Value + this.Children.reduce((p, c, i) => p + (i > 0 ? ',' : '') + c.NodeValue, '') + ')'
   }
+
+  ArgumentValue(name: string) {
+    const n = this.Children.find(n => (n as TermNode) && (n as TermNode).Identifier.toLowerCase() === name.toLowerCase())
+    return n && n.Children.length === 1 && n.Children[0]
+  }
 }
 
 export class AssignmentNode extends TermNode {
