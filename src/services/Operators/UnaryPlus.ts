@@ -19,5 +19,5 @@ export default (node:BaseNode, evaluator: Evaluator) => {
     return +childValue
   }
 
-  throw new SyntaxError("Unary Plus not supported children value")
+  throw new SyntaxError("Unary Plus not supported children type")
 }

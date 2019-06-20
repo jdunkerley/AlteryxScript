@@ -148,13 +148,18 @@ export const singleTermParser = (nodes: BaseNode[]) => {
   let result = mergeDots(nodes)
   result = handleAssignment(result)
 
-  // Binary Operators in Order ...
-  result = handleBinaryOperators(result, ['*', '/', '%'])
-  result = handleBinaryOperators(result, ['+', '-'])
-  result = handleBinaryOperators(result, ['<', '>', '<=', '>='])
-  result = handleBinaryOperators(result, ['==', '!='])
+  // Identify Operators
+  result = identifyUnaryOperators(result)
+  console.log(result)
 
-  result = handleUnaryOperators(identifyUnaryOperators(result))
+  // Binary Operators in Order ...
+  result = handleBinaryOperators(result, ['==', '!='])
+  result = handleBinaryOperators(result, ['<', '>', '<=', '>='])
+  result = handleBinaryOperators(result, ['+', '-'])
+  result = handleBinaryOperators(result, ['*', '/', '%'])
+
+  // Unary Operators
+  result = handleUnaryOperators(result)
 
   if (result.length > 1) {
     console.error("Non Singular", nodes, result)

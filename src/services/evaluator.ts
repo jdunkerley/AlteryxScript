@@ -2,6 +2,7 @@ import { BaseNode } from "./Nodes"
 import { TokenType } from "./TokenType"
 import Assignment from "./Operators/Assignment"
 import Unary from "./Operators/Unary"
+import Binary from "./Operators/Binary"
 
 const XMLHeader = `<?xml version="1.0"?>
 <AlteryxDocument yxmdVer="2019.1">
@@ -75,9 +76,7 @@ class AlteryxConnection {
   }
 }
 
-type VariableType = string | number | AlteryxNode 
-
-// To Do: BooleanSupport
+type VariableType = string | number | boolean | AlteryxNode 
 
 export class Evaluator {
   nextNodeId: number = 1
@@ -134,6 +133,8 @@ ${n.xmlConfig}
         return Assignment(node, this)
       case TokenType.UnaryOperator:
         return Unary(node, this)
+      case TokenType.BinaryOperator:
+        return Binary(node, this)
       case TokenType.Function:
         if (node.Value === 'Input(') {
           return this.addNode('AlteryxBasePluginsGui.DbFileInput.DbFileInput', 'AlteryxBasePluginsEngine.dll' ,'AlteryxDbFileInput', `
