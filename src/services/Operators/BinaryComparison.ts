@@ -22,6 +22,10 @@ export default (node:BaseNode, evaluator: Evaluator, operator: string, name: str
       return left <= right
     case '>=':
       return left >= right
+    case '&&':
+      return left && right
+    case '||':
+      return left || right
     default:
       throw new SyntaxError(`Binary ${name} not supported operator`)
   }

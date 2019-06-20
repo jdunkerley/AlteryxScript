@@ -30,6 +30,10 @@ export default (node:BaseNode, evaluator: Evaluator) => {
       return BinaryComparison(node, evaluator, node.Value, 'LessThanOrEqual')
     case '>=':
       return BinaryComparison(node, evaluator, node.Value, 'GreaterThanOrEqual')
+    case '||':
+      return BinaryComparison(node, evaluator, node.Value, 'LogicalOr')
+    case '&&':
+      return BinaryComparison(node, evaluator, node.Value, 'LogicalAnd')
     default:
       throw new SyntaxError("Invalid Binary Operator")
   }
