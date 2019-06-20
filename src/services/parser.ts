@@ -152,13 +152,19 @@ export const singleTermParser = (nodes: BaseNode[]) => {
   result = identifyUnaryOperators(result)
 
   // Binary Operators in Order ...
+  result = handleBinaryOperators(result, ['||'])
+  result = handleBinaryOperators(result, ['&&'])
+  result = handleBinaryOperators(result, ['^'])
+  result = handleBinaryOperators(result, ['|'])
+  result = handleBinaryOperators(result, ['&'])
   result = handleBinaryOperators(result, ['==', '!='])
   result = handleBinaryOperators(result, ['<', '>', '<=', '>='])
   result = handleBinaryOperators(result, ['+', '-'])
   result = handleBinaryOperators(result, ['*', '/', '%'])
+  result = handleBinaryOperators(result, ['**']) // ToDo: Should be right to left
 
-  // Unary Operators
-  result = handleUnaryOperators(result)
+  // Unary Operators - ! + -
+  result = handleUnaryOperators(result) // ToDo: Should be right to left
 
   if (result.length > 1) {
     console.error("Non Singular", nodes, result)
