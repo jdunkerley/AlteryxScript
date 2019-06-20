@@ -56,8 +56,17 @@ const Home: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const copyAsJSON = () => {
-    navigator.clipboard.writeText(xml)
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([xml], {type: 'text/xml'}))
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `workflow.yxwz`
+    document.body.appendChild(a)
+    a.click()
+    setTimeout(function() { 
+        document.body.removeChild(a) 
+        window.URL.revokeObjectURL(url) 
+    }, 0)
   }
 
   const execute= () => {
@@ -106,7 +115,7 @@ const Home: React.FC<Props> = (props: Props) => {
             <Typography variant="h6" color="inherit" className={classes.root}>
               Workflow XML:
             </Typography>
-            <Button variant="contained" color="primary" onClick={copyAsJSON} disabled={xml === '' || xml.substring(0,7) === '<Error>'}>
+            <Button variant="contained" color="primary" onClick={download} disabled={xml === '' || xml.substring(0,7) === '<Error>'}>
               <Icon>save_alt</Icon>&nbsp;
               Download
             </Button>
