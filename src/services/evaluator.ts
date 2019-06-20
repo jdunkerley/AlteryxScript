@@ -128,7 +128,7 @@ ${n.xmlConfig}
       case TokenType.Number:
         return +node.Value
       case TokenType.String:
-        return node.Value
+        return node.Value.substring(1, node.Value.length - 1)
       case TokenType.Assignment:
         return Assignment(node, this)
       case TokenType.UnaryOperator:

@@ -11,7 +11,7 @@ export default (node:BaseNode, evaluator: Evaluator) => {
   }
 
   const childValue = evaluator.evaluateStatement(node.Children[0])
-  if (childValue as number) {
+  if (typeof(childValue) === 'number') {
     return childValue
   }
 

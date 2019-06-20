@@ -25,11 +25,11 @@ export const breakToStatements = (tokens: Token[]) => {
   const result: Token[][] = []
   let current : Token[] = []
 
-  tokens.filter(t => t.Type !== TokenType.WhiteSpace)
-  .forEach((t, i) => {
+  const filtered = tokens.filter(t => t.Type !== TokenType.WhiteSpace)
+  filtered.forEach((t, i, a) => {
     if (t.Type === TokenType.NewLine) {
-      const prev = findLastNonComment(tokens, i, -1)
-      const next = findLastNonComment(tokens, i)
+      const prev = findLastNonComment(a, i, -1)
+      const next = findLastNonComment(a, i)
       if (!prev || !next || !(continuationTypes.indexOf(prev.Type) !== -1 || continuationTypes.indexOf(next.Type) !== -1)) {
         result.push(current)
         current = []
@@ -150,7 +150,6 @@ export const singleTermParser = (nodes: BaseNode[]) => {
 
   // Identify Operators
   result = identifyUnaryOperators(result)
-  console.log(result)
 
   // Binary Operators in Order ...
   result = handleBinaryOperators(result, ['==', '!='])

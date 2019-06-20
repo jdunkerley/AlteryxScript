@@ -29,7 +29,6 @@ const Home: React.FC<Props> = (props: Props) => {
   const { classes } = props
 
   const [ code, setCode ] = useState<string>(window.localStorage.getItem('parserRaw') || '')
-
   const [ xml, setXml ] = useState<string>('')
 
   const handleOnChange = (event: any) => {
@@ -57,8 +56,23 @@ const Home: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const copyAsJSON = (event: any) => {
+  const copyAsJSON = () => {
     navigator.clipboard.writeText(xml)
+  }
+
+  const execute= () => {
+    (async () => {
+      const rawResponse = await fetch('http://localhost:9000/dynamic', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: xml
+      })
+
+      const content = await rawResponse.json();
+      console.log(content);
+    })()
   }
 
   return (
@@ -92,12 +106,12 @@ const Home: React.FC<Props> = (props: Props) => {
             <Typography variant="h6" color="inherit" className={classes.root}>
               Workflow XML:
             </Typography>
-            <Button variant="contained" color="primary" onClick={copyAsJSON}>
-              <Icon>code</Icon>&nbsp;
+            <Button variant="contained" color="primary" onClick={copyAsJSON} disabled={xml === '' || xml.substring(0,7) === '<Error>'}>
+              <Icon>save_alt</Icon>&nbsp;
               Download
             </Button>
-            <Button variant="contained" color="primary" onClick={copyAsJSON}>
-              <Icon>code</Icon>&nbsp;
+            <Button variant="contained" color="primary" onClick={execute} disabled={xml === '' || xml.substring(0,7) === '<Error>'}>
+              <Icon>play_arrow</Icon>&nbsp;
               Execute
             </Button>
           </Toolbar>
