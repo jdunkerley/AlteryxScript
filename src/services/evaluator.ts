@@ -1,3 +1,8 @@
+import { BaseNode } from "./Nodes"
+import { TokenType } from "./TokenType"
+import Assignment from "./Operators/Assignment"
+import Unary from "./Operators/Unary"
+
 const XMLHeader = `<?xml version="1.0"?>
 <AlteryxDocument yxmdVer="2019.1">
   <Nodes>
@@ -70,7 +75,9 @@ class AlteryxConnection {
   }
 }
 
-type VariableType = string | number | AlteryxNode
+type VariableType = string | number | AlteryxNode 
+
+// To Do: BooleanSupport
 
 export class Evaluator {
   nextNodeId: number = 1
@@ -110,5 +117,56 @@ ${n.xmlConfig}
     </Connection>
 `, '') + 
       XMLFooter
+  }
+
+  evaluateStatement(node:BaseNode) : VariableType {
+    switch (node.Type) {
+      case TokenType.Identifier:
+        if (this.variables[node.Value]) {
+          return this.variables[node.Value]
+        }
+        throw new SyntaxError(`Unknown variable - ${node.Value}`)
+      case TokenType.Number:
+        return +node.Value
+      case TokenType.String:
+        return node.Value
+      case TokenType.Assignment:
+        return Assignment(node, this)
+      case TokenType.UnaryOperator:
+        return Unary(node, this)
+      case TokenType.Function:
+        if (node.Value === 'Input(') {
+          return this.addNode('AlteryxBasePluginsGui.DbFileInput.DbFileInput', 'AlteryxBasePluginsEngine.dll' ,'AlteryxDbFileInput', `
+          <Passwords />
+          <File OutputFileName="" RecordLimit="" SearchSubDirs="False" FileFormat="0">C:\\temp\\Encoding Time.csv</File>
+          <FormatSpecificOptions>
+            <CodePage>28591</CodePage>
+            <Delimeter>,</Delimeter>
+            <IgnoreErrors>False</IgnoreErrors>
+            <FieldLen>254</FieldLen>
+            <AllowShareWrite>False</AllowShareWrite>
+            <HeaderRow>True</HeaderRow>
+            <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
+            <ImportLine>1</ImportLine>
+          </FormatSpecificOptions>
+`, 'Output', ['Output'])
+        } else if (node.Value === 'Output(') {
+          const node = this.addNode('AlteryxBasePluginsGui.DbFileInput.DbFileOutput', 'AlteryxBasePluginsEngine.dll' ,'AlteryxDbFileOutput', `
+          <File FileFormat="54" MaxRecords="">C:\\temp\\Test.json</File>
+          <Passwords />
+          <FormatSpecificOptions>
+            <CodePage>28591</CodePage>
+          </FormatSpecificOptions>
+          <MultiFile value="False" />
+`, '', [])
+          this.addConnection(1, 'Input', 2, 'Output')
+          return node
+        }
+        throw new SyntaxError("Failed to evaluate node")
+      // Binary Operators
+      // Functions
+      default:
+        throw new SyntaxError("Failed to evaluate node")
+    }
   }
 }

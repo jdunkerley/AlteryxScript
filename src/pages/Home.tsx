@@ -5,9 +5,8 @@ import GridList from '@material-ui/core/GridList'
 import GridListTile from '@material-ui/core/GridListTile'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
-import { TokenType } from '../services/TokenType'
-import { BaseNode } from '../services/Nodes'
 import parser from '../services/parser'
+import { Evaluator } from '../services/evaluator'
 import { Toolbar, Button, Icon } from '@material-ui/core'
 
 const styles = createStyles({
@@ -29,25 +28,52 @@ export interface Props extends WithStyles<typeof styles> {
 const Home: React.FC<Props> = (props: Props) => {
   const { classes } = props
 
-  const [ tokens, setTokens ] = useState<BaseNode[][]>([])
+  const [ code, setCode ] = useState<string>(window.localStorage.getItem('parserRaw') || '')
+
+  const [ xml, setXml ] = useState<string>('')
 
   const handleOnChange = (event: any) => {
+    window.localStorage.setItem('parserRaw', event.target.value)
+    setCode(event.target.value)
+  }
+
+  const evaluateCode = (event: any) => {
     try {
-      window.localStorage.setItem('parserRaw', event.target.value)
-      const parsed = parser(event.target.value)
+      const parsed = parser(code)
+
+      const evaluator = new Evaluator()
+      parsed.forEach(s => {
+        if (s.length > 1) {
+          throw new SyntaxError("Cannot Parse")
+        }
+
+        evaluator.evaluateStatement(s[0])
+        console.log(evaluator.variables, evaluator.nodes, evaluator.connections)
+
+        setXml(evaluator.renderXml())
+      })
     } catch (e) {
-      setTokens([[new BaseNode(TokenType.Error, `Unable to tokenise: ${e.message}`)]])
+      setXml(`<Error>Unable to tokenise: ${e.message}</Error>`)
     }
   }
 
   const copyAsJSON = (event: any) => {
-    navigator.clipboard.writeText(JSON.stringify(tokens))
+    navigator.clipboard.writeText(xml)
   }
 
   return (
     <div className={classes.root}>
       <Grid container spacing={24}>
         <Grid item xs={6}>
+        <Toolbar>
+            <Typography variant="h6" color="inherit" className={classes.root}>
+              Code:
+            </Typography>
+            <Button variant="contained" color="primary" onClick={evaluateCode}>
+              <Icon>code</Icon>&nbsp;
+              Evaluate
+            </Button>
+          </Toolbar>
           <TextField
             id="outlined-multiline-static"
             label="Code"
@@ -61,26 +87,26 @@ const Home: React.FC<Props> = (props: Props) => {
             value={window.localStorage.getItem('parserRaw') || ''}
           />
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={6}>
           <Toolbar>
             <Typography variant="h6" color="inherit" className={classes.root}>
-              State:
+              Workflow XML:
             </Typography>
             <Button variant="contained" color="primary" onClick={copyAsJSON}>
               <Icon>code</Icon>&nbsp;
-              Copy as JSON
+              Download
+            </Button>
+            <Button variant="contained" color="primary" onClick={copyAsJSON}>
+              <Icon>code</Icon>&nbsp;
+              Execute
             </Button>
           </Toolbar>
           <GridList cols={1} cellHeight={'auto'}>
-            { tokens.map((subTokens, i) => (
-              <GridListTile key={i} style={{overflow: 'visible'}} >
-                <pre style={{display: 'inline-block', paddingLeft: '5px'}}>
-                { subTokens.map((token, j) => (
-                  <abbr style={{paddingRight: '5px'}} title={token.Type} key={`${i}_${j}`}>{token.NodeValue}</abbr>
-                ))}
-                </pre>
-              </GridListTile>
-            ))}
+            <GridListTile style={{overflow: 'visible'}} >
+              <pre style={{display: 'inline-block', paddingLeft: '5px'}}>
+                {xml}
+              </pre>
+            </GridListTile>
           </GridList>
         </Grid>
       </Grid>
