@@ -18,7 +18,7 @@ const Header: React.FC<Props> = (props: Props) => {
       <AppBar position="static" color="default">
         <Toolbar>
           <Typography variant="h6" color="inherit" inline>
-            AlterScript
+            <a href="https://github.com/jdunkerley/AlteryxScript/wiki">AlterScript</a>
           </Typography>
           <div style={{flexGrow: 1}} />
           <Tabs value={location.pathname}>

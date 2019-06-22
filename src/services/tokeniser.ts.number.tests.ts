@@ -26,3 +26,13 @@ it('Can Tokeniser Decimal', () => {
     expect(tokens[0].Type).toBe(TokenType.Number)
     expect(tokens[0].Value).toBe(number)
 })
+
+it('Rejects two decimals', () => {
+  const number = '0.2.4'
+  const tokens = tokenise(number)
+  expect(tokens).toBeInstanceOf(Array)
+  expect(tokens.length).toBeGreaterThan(1)
+  expect(tokens[0]).toBeDefined()
+  expect(tokens[0].Type).toBe(TokenType.Number)
+  expect(tokens[0].Value).toBe(number)
+})

@@ -33,10 +33,10 @@ export class AlteryxNode {
   readonly engineDll: string
   readonly engineEntryPoint: string
   readonly xmlConfig: string
-  readonly defaultConnection: string
+  readonly defaultConnection: string | null
   readonly connections: string[]
 
-  constructor(nodeId: number, plugin: string, engineDll: string, engineEntryPoint: string, xmlConfiguration: string, defaultConnection: string, connections: string[] = []) {
+  constructor(nodeId: number, plugin: string, engineDll: string, engineEntryPoint: string, xmlConfiguration: string, defaultConnection: string | null = null, connections: string[] = []) {
     this.nodeId = nodeId
     this.plugin = plugin
     this.engineDll = engineDll
@@ -85,7 +85,7 @@ export class Evaluator {
   readonly connections: AlteryxConnection[] = []
   readonly variables: Record<string, VariableType> = {}
 
-  addNode(plugin: string, engineDll: string, engineEntryPoint: string, xmlConfiguration: string, defaultConnection: string, connections: string[] = []) {
+  addNode(plugin: string, engineDll: string, engineEntryPoint: string, xmlConfiguration: string, defaultConnection: string | null = null, connections: string[] = []) {
     const node = new AlteryxNode(this.nextNodeId, plugin, engineDll, engineEntryPoint, xmlConfiguration, defaultConnection, connections)
     this.nextNodeId++
     this.nodes.push(node)

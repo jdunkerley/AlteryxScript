@@ -10,7 +10,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
   }
 
   const firstChild = evaluator.evaluateStatement(node.Children[0].Children[0]) as AlteryxNode
-  if (!firstChild) {
+  if (!firstChild || !firstChild.defaultConnection) {
     throw new SyntaxError("Output first argument must be a connection")
   }
 
@@ -28,7 +28,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
       <CodePage>28591</CodePage>
     </FormatSpecificOptions>
     <MultiFile value="False" />
-`, '', [])
+`)
 
     evaluator.addConnection(firstChild.nodeId, firstChild.defaultConnection, newNode.nodeId, 'Input')
     return newNode

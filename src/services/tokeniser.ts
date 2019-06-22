@@ -41,7 +41,7 @@ export const TokenPatterns: ITokenPatterns = {
   [TokenType.Comma]: (s) => letterMatch(s, ','),
   [TokenType.Dot]: (s) => letterMatch(s, '.'),
   [TokenType.Comment]: (s) => regExpMatch(s, /^(\/\/.*?)\r?\n/),
-  [TokenType.Number]: (s) => regExpMatch(s, /^([0-9][0-9.]*)/),
+  [TokenType.Number]: (s) => regExpMatch(s, /^([0-9]+(\.[0-9]+)?)/),
   [TokenType.String]: (s) => regExpMatch(s, /^(''|""|('|")(.*?[^\\])(\2))/), // ToDo: Not perfect
   [TokenType.Identifier]: (s) => regExpMatch(s, /^([A-Za-z_][A-Za-z0-9_]*|\[.*?\])/)
 }
