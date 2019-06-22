@@ -2,6 +2,7 @@ import { FunctionNode } from "../Nodes"
 import { Evaluator } from "../evaluator"
 
 // First argument: Filename
+
 const fileFormats : Record<string, number> = {
   csv: 0,
   yxdb: 19,
@@ -27,17 +28,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
     FieldLength: '65532',
     Delimeter: ','
   }
-  
-  Object.keys(settings).forEach(k => {
-    const child = node.ArgumentValue(k)
-    if (child) {
-      let newValue = evaluator.evaluateStatement(child)
-      if (typeof(newValue) === "boolean") {
-        newValue = newValue ? 'True' : 'False'
-      }
-      settings[k] = String(newValue)
-    }
-  })
+  evaluator.evaluateSettings(node, settings)
 
   return evaluator.addNode(
     'AlteryxBasePluginsGui.DbFileInput.DbFileInput',

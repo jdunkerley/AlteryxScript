@@ -1,4 +1,4 @@
-import { BaseNode } from "./Nodes"
+import { BaseNode, FunctionNode } from "./Nodes"
 import { TokenType } from "./TokenType"
 import Assignment from "./Operators/Assignment"
 import Unary from "./Operators/Unary"
@@ -100,7 +100,7 @@ export class Evaluator {
     return XMLHeader + 
       this.nodes.reduce((p, n) => p + `    <Node ToolID="${n.nodeId}">
       <GuiSettings Plugin="${n.plugin}">
-        <Position x="${25 * n.nodeId}" y="${25 * n.nodeId}" />
+        <Position x="${20}" y="${20 + 75 * n.nodeId}" />
       </GuiSettings>
       <Properties>
         <Configuration>
@@ -117,6 +117,19 @@ ${n.xmlConfig}
     </Connection>
 `, '') + 
       XMLFooter
+  }
+
+  evaluateSettings(node:FunctionNode, settings: Record<string, string>) {
+    Object.keys(settings).forEach(k => {
+      const child = node.ArgumentValue(k)
+      if (child) {
+        let newValue = this.evaluateStatement(child)
+        if (typeof(newValue) === "boolean") {
+          newValue = newValue ? 'True' : 'False'
+        }
+        settings[k] = String(newValue)
+      }
+    })
   }
 
   evaluateStatement(node:BaseNode) : VariableType {

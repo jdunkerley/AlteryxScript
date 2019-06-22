@@ -1,10 +1,12 @@
 import { BaseNode, FunctionNode } from "../Nodes"
 import { Evaluator, VariableType } from "../evaluator"
 import Input from "./Input"
+import Sample from "./Sample"
 import Output from "./Output"
 
 const functions: Record<string, (node:FunctionNode, evaluator: Evaluator) => VariableType> = {
   "input": Input,
+  "sample": Sample,
   "output": Output
 }
 
