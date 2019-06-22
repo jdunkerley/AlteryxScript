@@ -126,6 +126,15 @@ ${n.xmlConfig}
           return this.variables[node.Value]
         }
         throw new SyntaxError(`Unknown variable - ${node.Value}`)
+      case TokenType.Property:
+        if (node.Children.length !== -1) {
+          throw new SyntaxError("Property not understood invalid number of Children")
+        }
+        const parent = this.evaluateStatement(node.Children[0]) as AlteryxNode
+        if (!parent) {
+          throw new SyntaxError("Property can only be on a Node function")
+        }
+        return parent.AlternateConnection(node.Value)
       case TokenType.Number:
         return +node.Value
       case TokenType.String:
