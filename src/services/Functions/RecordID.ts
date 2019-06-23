@@ -44,7 +44,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
   const newNode = evaluator.addNode(
     'AlteryxBasePluginsGui.RecordID.RecordID',
     'AlteryxBasePluginsEngine.dll' ,'AlteryxRecordID', `
-    <FieldName>${settings.RecordID}</FieldName>
+    <FieldName>${settings.FieldName}</FieldName>
     <StartValue>${settings.StartValue}</StartValue>
     <FieldType>${settings.FieldType}</FieldType>
     <FieldSize>${settings.FieldSize}</FieldSize>
