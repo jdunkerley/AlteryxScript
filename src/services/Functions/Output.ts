@@ -4,14 +4,16 @@ import { Evaluator, AlteryxNode } from "../evaluator"
 // First argument: Connection
 // Second argument: Filename
 
+const name = "RecordID"
+
 export default (node:FunctionNode, evaluator: Evaluator) => {
   if (node.Children.length < 2) {
-    throw new SyntaxError("Output requires a connection and a filename")
+    throw new SyntaxError(`${name} requires a connection and a filename`)
   }
 
   const firstChild = evaluator.evaluateStatement(node.Children[0].Children[0]) as AlteryxNode
   if (!firstChild || !firstChild.defaultConnection) {
-    throw new SyntaxError("Output first argument must be a connection")
+    throw new SyntaxError(`${name} first argument must be a connection`)
   }
 
   const secondChild = evaluator.evaluateStatement(node.Children[1].Children[0])
