@@ -14,6 +14,7 @@ phases:
       - echo Entered the build phase...
       - echo Build started on `date`
       - npm run-script build
+      - CI=true npm test
       - cd build
       - aws s3 sync . s3://alterscript.io --delete --acl public-read
     finally:
