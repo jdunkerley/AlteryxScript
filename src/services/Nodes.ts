@@ -11,7 +11,10 @@ export class BaseNode {
 
   constructor(type: TokenType, value: string, children: BaseNode[] | null = null) {
     this.Type = type
-    this.Value = value
+
+    this.Value = (type === TokenType.String || (type === TokenType.Identifier && value[0] === '[' && value.substr(-1) === ']'))
+      ? value.substring(1, value.length - 1) 
+      : value
     this.Children = children || []
   }
 

@@ -27,14 +27,15 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
 
   // Handle FieldName
   const fieldNameNode = node.ArgumentValue('FieldName')
+  console.log(fieldNameNode)
   settings.FieldName = 'RecordID'
-  if (fieldNameNode && fieldNameNode.Children.length === 1) {
-    if (fieldNameNode.Children[0].Type === TokenType.Identifier) {
-      if (evaluator.variables[fieldNameNode.Children[0].Value]) {
+  if (fieldNameNode) {
+    if (fieldNameNode.Children.length === 0) {
+      if (fieldNameNode.Type === TokenType.Identifier && evaluator.variables[fieldNameNode.Value]) {
         const value = evaluator.variables[fieldNameNode.Children[0].Value]
         settings.FieldName = String(value)
       } else {
-        settings.FieldName = fieldNameNode.Children[0].Value
+        settings.FieldName = String(fieldNameNode.Value)
       }
     } else {
       settings.FieldName = String(evaluator.evaluateStatement(node.Children[0]))
