@@ -152,6 +152,8 @@ ${n.xmlConfig}
         return +node.Value
       case TokenType.String:
         return node.Value
+      case TokenType.Boolean:
+        return node.Value.toLowerCase() !== 'false'
       case TokenType.Assignment:
         return Assignment(node, this)
       case TokenType.UnaryOperator:

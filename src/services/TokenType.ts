@@ -11,6 +11,7 @@ export enum TokenType {
   Comment = "Comment",
   Number = "Number",
   String = "String",
+  Boolean = "Boolean",
   OpenBracket = "OpenBracket",
   CloseBracket = "CloseBracket",
   Colon = "Colon",
