@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import Grid from '@material-ui/core/Grid'
 import GridList from '@material-ui/core/GridList'
 import GridListTile from '@material-ui/core/GridListTile'
@@ -30,6 +32,7 @@ const Home: React.FC<Props> = (props: Props) => {
 
   const [ code, setCode ] = useState<string>(window.localStorage.getItem('parserRaw') || '')
   const [ xml, setXml ] = useState<string>('')
+  const [ tabValue, setTabValue ] = useState<number>(0)
 
   const handleOnChange = (event: any) => {
     window.localStorage.setItem('parserRaw', event.target.value)
@@ -112,9 +115,6 @@ const Home: React.FC<Props> = (props: Props) => {
         </Grid>
         <Grid item xs={6}>
           <Toolbar>
-            <Typography variant="h6" color="inherit" className={classes.root}>
-              Workflow XML:
-            </Typography>
             <Button variant="contained" color="primary" onClick={download} disabled={xml === '' || xml.substring(0,7) === '<Error>'}>
               <Icon>save_alt</Icon>&nbsp;
               Download
@@ -124,13 +124,17 @@ const Home: React.FC<Props> = (props: Props) => {
               Execute
             </Button>
           </Toolbar>
+          <Tabs value={tabValue} onChange={(e, n) => setTabValue(n)} disabled={xml === ''}>
+            <Tab label="Workflow XML">Workflow XML</Tab>
+          </Tabs>
+          {tabValue === 0 &&
           <GridList cols={1} cellHeight={'auto'}>
             <GridListTile style={{overflow: 'visible'}} >
               <pre style={{display: 'inline-block', paddingLeft: '5px'}}>
                 {xml}
               </pre>
             </GridListTile>
-          </GridList>
+          </GridList>}
         </Grid>
       </Grid>
     </div>
