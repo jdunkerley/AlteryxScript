@@ -8,6 +8,19 @@ import Func from "./Functions/Function"
 const XMLHeader = `<?xml version="1.0"?>
 <AlteryxDocument yxmdVer="2019.1">
   <Nodes>
+  <Node ToolID="1">
+  <GuiSettings Plugin="AlteryxGuiToolkit.Questions.Tab.Tab">
+    <Position x="0" y="0" width="59" height="59" />
+  </GuiSettings>
+  <Properties>
+    <Configuration />
+    <Annotation DisplayMode="0">
+      <Name />
+      <DefaultAnnotationText />
+      <Left value="False" />
+    </Annotation>
+  </Properties>
+</Node>
 `
 
 const XMLMiddle = `
@@ -20,12 +33,33 @@ const XMLFooter = `
   <Properties>
     <RuntimeProperties>
       <Actions />
-      <Questions />
+      <Questions>
+        <Question>
+          <Type>Tab</Type>
+          <Description>Alter Script</Description>
+          <Name>AlterScript</Name>
+          <ToolId value="1" />
+          <Questions />
+        </Question>
+      </Questions>
       <ModuleType>Wizard</ModuleType>
     </RuntimeProperties>
   </Properties>
 </AlteryxDocument>
 `
+
+const xmlChar: Record<string, string> = {
+  '<': '&lt;',
+  '>': '&gt;',
+  '&': '&amp;',
+  '\'': '&apos;',
+  '"': '&quot;'
+}
+
+export function EscapeXml(unsafe:string) {
+  return unsafe.replace(/[<>&'"]/g, c => xmlChar[c] || c)
+}
+
 
 export class AlteryxNode {
   readonly nodeId: number
@@ -35,9 +69,14 @@ export class AlteryxNode {
   readonly xmlConfig: string
   readonly defaultConnection: string | null
   readonly connections: string[]
+  annotation: string = ''
+  nodeX: number
+  nodeY: number
 
   constructor(nodeId: number, plugin: string, engineDll: string, engineEntryPoint: string, xmlConfiguration: string, defaultConnection: string | null = null, connections: string[] = []) {
     this.nodeId = nodeId
+    this.nodeX = 20
+    this.nodeY = 20 + 75 * this.nodeId
     this.plugin = plugin
     this.engineDll = engineDll
     this.engineEntryPoint = engineEntryPoint
@@ -61,6 +100,27 @@ export class AlteryxNode {
       this.connections
     )
   }
+
+  RenderXml() {
+    return `    <Node ToolID="${this.nodeId}">
+    <GuiSettings Plugin="${this.plugin}">
+      <Position x="${20}" y="${20 + 75 * this.nodeId}" />
+    </GuiSettings>
+    <Properties>
+      <Configuration>
+${this.xmlConfig}
+      </Configuration>
+${
+  this.annotation ? `      <Annotation DisplayMode="0">
+        <AnnotationText>${EscapeXml(this.annotation)}</AnnotationText>
+      </Annotation>`
+  : ''
+}
+    </Properties>
+    <EngineSettings EngineDll="${this.engineDll}" EngineDllEntryPoint="${this.engineEntryPoint}" />
+  </Node>
+`
+  }
 }
 
 class AlteryxConnection {
@@ -80,13 +140,16 @@ class AlteryxConnection {
 export type VariableType = string | number | boolean | AlteryxNode 
 
 export class Evaluator {
-  nextNodeId: number = 1
+  nextNodeId: number = 2
   readonly nodes: AlteryxNode[] = []
   readonly connections: AlteryxConnection[] = []
   readonly variables: Record<string, VariableType> = {}
 
-  addNode(plugin: string, engineDll: string, engineEntryPoint: string, xmlConfiguration: string, defaultConnection: string | null = null, connections: string[] = []) {
+  addNode(plugin: string, engineDll: string, engineEntryPoint: string, xmlConfiguration: string, defaultConnection: string | null = null, connections: string[] = [], annotation: string | null = null) {
     const node = new AlteryxNode(this.nextNodeId, plugin, engineDll, engineEntryPoint, xmlConfiguration, defaultConnection, connections)
+    if (annotation) {
+      node.annotation = annotation
+    }
     this.nextNodeId++
     this.nodes.push(node)
     return node
@@ -98,18 +161,7 @@ export class Evaluator {
 
   renderXml() {
     return XMLHeader + 
-      this.nodes.reduce((p, n) => p + `    <Node ToolID="${n.nodeId}">
-      <GuiSettings Plugin="${n.plugin}">
-        <Position x="${20}" y="${20 + 75 * n.nodeId}" />
-      </GuiSettings>
-      <Properties>
-        <Configuration>
-${n.xmlConfig}
-        </Configuration>
-      </Properties>
-      <EngineSettings EngineDll="${n.engineDll}" EngineDllEntryPoint="${n.engineEntryPoint}" />
-    </Node>
-`, '') + 
+      this.nodes.reduce((p, n) => p + n.RenderXml(), '') + 
       XMLMiddle + 
       this.connections.reduce((p, c) => p + `    <Connection>
       <Origin ToolID="${c.leftNodeId}" Connection="${c.leftConnection}" />

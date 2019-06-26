@@ -30,7 +30,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
       <CodePage>28591</CodePage>
     </FormatSpecificOptions>
     <MultiFile value="False" />
-`)
+`, null, [], node.rawText)
 
     evaluator.addConnection(firstChild.nodeId, firstChild.defaultConnection, newNode.nodeId, 'Input')
     return newNode

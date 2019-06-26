@@ -27,7 +27,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
       'AlteryxBasePluginsEngine.dll' ,'AlteryxSample', `
       <Mode>${k}</Mode>
       <N>${settings[k]}</N>
-`, 'Output', ['Output'])
+`, 'Output', ['Output'], node.rawText)
 
       if (!output.defaultConnection) {
         throw new SyntaxError("Error handling Sample")

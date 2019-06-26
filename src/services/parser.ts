@@ -191,6 +191,7 @@ export const makeTerms = (nodes: BaseNode[]) => {
     if (currentNodes[0].Type !== TokenType.Function) {
       currentNodes[0].Children = singleTermParser(currentNodes[0].Children)
     }
+
     currentNodes.shift()
   }
 
@@ -202,11 +203,11 @@ export const makeTerms = (nodes: BaseNode[]) => {
     closeLayer()
   }
 
-  nodes.forEach((t) => {
+  nodes.forEach((t, i, a) => {
     if (t.Type === TokenType.OpenBracket) {
       openLayer(new TermNode(TokenType.OpenBracket, '', []))
     } else if (t.Type === TokenType.Function) {
-      openLayer(new FunctionNode(t.Value, []))
+      openLayer(new FunctionNode(t.Value, [], i))
       openLayer(new TermNode(TokenType.Argument, '', []))
     } else if (t.Type === TokenType.Comma) {
       if (!isFunction()) {
@@ -234,6 +235,11 @@ export const makeTerms = (nodes: BaseNode[]) => {
 
       if (isFunction()) {
         closeArgument()
+      }
+
+      const fnNode = currentNodes[0] as FunctionNode
+      if (fnNode) {
+        fnNode.rawText = a.slice(fnNode.startIndex, i).reduce((p, c) => p + c.rawText, '')
       }
 
       closeLayer()

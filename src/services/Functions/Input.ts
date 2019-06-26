@@ -43,5 +43,5 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
       <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
       <ImportLine>${settings.ImportLine}</ImportLine>
     </FormatSpecificOptions>
-`, 'Output', ['Output'])
+`, 'Output', ['Output'], node.rawText)
 }

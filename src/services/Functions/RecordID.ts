@@ -50,7 +50,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
     <FieldType>${settings.FieldType}</FieldType>
     <FieldSize>${settings.FieldSize}</FieldSize>
     <Position>${settings.LastColumn === 'True' ? 1 : 0}</Position>
-`, 'Output', ['Output'])
+`, 'Output', ['Output'], node.rawText)
 
     evaluator.addConnection(firstChild.nodeId, firstChild.defaultConnection, newNode.nodeId, 'Input')
     return newNode

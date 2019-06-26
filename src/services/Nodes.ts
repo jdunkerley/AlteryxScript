@@ -7,11 +7,13 @@ export const tokensToNodes = (tokens: Token[]) => {
 export class BaseNode {
   readonly Type: TokenType
   readonly Value: string
+  rawText: string = ''
   Children: BaseNode[]
 
   constructor(type: TokenType, value: string, children: BaseNode[] | null = null) {
     this.Type = type
 
+    this.rawText = value
     this.Value = (type === TokenType.String || (type === TokenType.Identifier && value[0] === '[' && value.substr(-1) === ']'))
       ? value.substring(1, value.length - 1) 
       : value
@@ -48,8 +50,11 @@ export class TermNode extends BaseNode {
 }
 
 export class FunctionNode extends BaseNode {
-  constructor(value: string, children: BaseNode[] | null = null) {
+  readonly startIndex: number
+
+  constructor(value: string, children: BaseNode[] | null, index: number) {
     super(TokenType.Function, value, children)
+    this.startIndex = index
   }
 
   get NodeValue(): string {
@@ -63,7 +68,7 @@ export class FunctionNode extends BaseNode {
 }
 
 export class AssignmentNode extends TermNode {
-  constructor(children: BaseNode[] | null = null, identifierNode: BaseNode) {
+  constructor(children: BaseNode[] | null, identifierNode: BaseNode) {
     super(TokenType.Assignment, `${identifierNode.Value}=`, children, identifierNode)
   }
 
