@@ -26,7 +26,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
     SearchSubDirs: 'False',
     ImportLine: '1',
     FieldLength: '65532',
-    Delimeter: ','
+    Delimiter: ','
   }
   evaluator.evaluateSettings(node, settings)
 
@@ -37,7 +37,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
         <File OutputFileName="" RecordLimit="${settings.RecordLimit}" SearchSubDirs="${settings.SearchSubDirs}" FileFormat="${fileFormats[settings.FileType]}">${firstChild}</File>
         <FormatSpecificOptions>
           <CodePage>28591</CodePage>
-          <Delimeter>${settings.Delimeter}</Delimeter>
+          <Delimeter>${settings.Delimiter}</Delimeter>
           <FieldLen>${settings.FieldLength}</FieldLen>
           <HeaderRow>${settings.HeaderRow}</HeaderRow>
           <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
