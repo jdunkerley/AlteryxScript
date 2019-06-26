@@ -1,5 +1,6 @@
 import { FunctionNode } from "../Nodes"
-import { Evaluator, AlteryxNode } from "../evaluator"
+import { Evaluator } from "../evaluator"
+import { AlteryxNode } from "../AlteryxNode"
 import { TokenType } from "../TokenType";
 
 // First argument: Connection
@@ -42,7 +43,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
     }
   }
 
-  const newNode = evaluator.addNode(
+  const newNode = evaluator.document.addNode(
     'AlteryxBasePluginsGui.RecordID.RecordID',
     'AlteryxBasePluginsEngine.dll' ,'AlteryxRecordID', `
     <FieldName>${settings.FieldName}</FieldName>
@@ -52,6 +53,6 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
     <Position>${settings.LastColumn === 'True' ? 1 : 0}</Position>
 `, 'Output', ['Output'], node.rawText)
 
-    evaluator.addConnection(firstChild.nodeId, firstChild.defaultConnection, newNode.nodeId, 'Input')
+    evaluator.document.addConnection(firstChild.nodeId, firstChild.defaultConnection, newNode.nodeId, 'Input')
     return newNode
 }

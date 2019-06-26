@@ -1,5 +1,6 @@
 import { FunctionNode } from "../Nodes"
-import { Evaluator, AlteryxNode } from "../evaluator"
+import { Evaluator } from "../evaluator"
+import { AlteryxNode } from "../AlteryxNode"
 
 // First argument: InputData
 
@@ -22,7 +23,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
 
   let output = firstChild
   keyNames.filter(k => settings[k]).forEach(k => {
-    const newOutput = evaluator.addNode(
+    const newOutput = evaluator.document.addNode(
       'AlteryxBasePluginsGui.Sample.Sample',
       'AlteryxBasePluginsEngine.dll' ,'AlteryxSample', `
       <Mode>${k}</Mode>
@@ -32,7 +33,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
       if (!output.defaultConnection) {
         throw new SyntaxError("Error handling Sample")
       }
-      evaluator.addConnection(output.nodeId, output.defaultConnection, newOutput.nodeId, 'Input')
+      evaluator.document.addConnection(output.nodeId, output.defaultConnection, newOutput.nodeId, 'Input')
       output = newOutput
   })
   return output

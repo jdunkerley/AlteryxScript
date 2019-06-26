@@ -1,5 +1,6 @@
 import { FunctionNode } from "../Nodes"
-import { Evaluator, AlteryxNode } from "../evaluator"
+import { Evaluator } from "../evaluator"
+import { AlteryxNode } from "../AlteryxNode"
 
 // First argument: Connection
 // Second argument: Filename
@@ -21,7 +22,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
     throw new SyntaxError("Output second argument must be a filename")
   }
 
-  const newNode = evaluator.addNode(
+  const newNode = evaluator.document.addNode(
     'AlteryxBasePluginsGui.DbFileOutput.DbFileOutput',
     'AlteryxBasePluginsEngine.dll' ,'AlteryxDbFileOutput', `
     <File FileFormat="54" MaxRecords="">${secondChild}</File>
@@ -32,6 +33,6 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
     <MultiFile value="False" />
 `, null, [], node.rawText)
 
-    evaluator.addConnection(firstChild.nodeId, firstChild.defaultConnection, newNode.nodeId, 'Input')
+    evaluator.document.addConnection(firstChild.nodeId, firstChild.defaultConnection, newNode.nodeId, 'Input')
     return newNode
 }

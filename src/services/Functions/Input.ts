@@ -30,7 +30,7 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
   }
   evaluator.evaluateSettings(node, settings)
 
-  return evaluator.addNode(
+  return evaluator.document.addNode(
     'AlteryxBasePluginsGui.DbFileInput.DbFileInput',
     'AlteryxBasePluginsEngine.dll' ,'AlteryxDbFileInput', `
         <Passwords />

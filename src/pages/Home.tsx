@@ -17,7 +17,8 @@ const styles = createStyles({
   },
   textField: {
     marginLeft: '2px',
-    marginRight: '2px'
+    marginRight: '2px',
+    fontFamily: 'Lucida Console, Consolas, Courier, monospace'
   },
   button: {
     margin: '2px'
@@ -50,9 +51,9 @@ const Home: React.FC<Props> = (props: Props) => {
         }
 
         evaluator.evaluateStatement(s[0])
-        console.log(evaluator.variables, evaluator.nodes, evaluator.connections)
+        console.log(evaluator.variables, evaluator.document.nodes, evaluator.document.connections)
 
-        setXml(evaluator.renderXml())
+        setXml(evaluator.document.renderXml())
       })
     } catch (e) {
       setXml(`<Error>Unable to tokenise: ${e.message}</Error>`)
@@ -126,6 +127,7 @@ const Home: React.FC<Props> = (props: Props) => {
           </Toolbar>
           <Tabs value={tabValue} onChange={(e, n) => setTabValue(n)} disabled={xml === ''}>
             <Tab label="Workflow XML">Workflow XML</Tab>
+            <Tab label="Node Graph">Node Graph</Tab>
           </Tabs>
           {tabValue === 0 &&
           <GridList cols={1} cellHeight={'auto'}>
