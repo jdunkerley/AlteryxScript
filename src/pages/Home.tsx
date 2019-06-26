@@ -44,7 +44,7 @@ const Home: React.FC<Props> = (props: Props) => {
       const parsed = parser(code)
 
       const evaluator = new Evaluator()
-      parsed.forEach(s => {
+      parsed.filter(p => p.length).forEach(s => {
         if (s.length > 1) {
           throw new SyntaxError("Cannot Parse")
         }

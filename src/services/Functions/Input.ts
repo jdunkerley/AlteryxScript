@@ -33,15 +33,15 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
   return evaluator.addNode(
     'AlteryxBasePluginsGui.DbFileInput.DbFileInput',
     'AlteryxBasePluginsEngine.dll' ,'AlteryxDbFileInput', `
-    <Passwords />
-    <File OutputFileName="" RecordLimit="${settings.RecordLimit}" SearchSubDirs="${settings.SearchSubDirs}" FileFormat="${fileFormats[settings.FileType]}">${firstChild}</File>
-    <FormatSpecificOptions>
-      <CodePage>28591</CodePage>
-      <Delimeter>${settings.Delimeter}</Delimeter>
-      <FieldLen>${settings.FieldLength}</FieldLen>
-      <HeaderRow>${settings.HeaderRow}</HeaderRow>
-      <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
-      <ImportLine>${settings.ImportLine}</ImportLine>
-    </FormatSpecificOptions>
+        <Passwords />
+        <File OutputFileName="" RecordLimit="${settings.RecordLimit}" SearchSubDirs="${settings.SearchSubDirs}" FileFormat="${fileFormats[settings.FileType]}">${firstChild}</File>
+        <FormatSpecificOptions>
+          <CodePage>28591</CodePage>
+          <Delimeter>${settings.Delimeter}</Delimeter>
+          <FieldLen>${settings.FieldLength}</FieldLen>
+          <HeaderRow>${settings.HeaderRow}</HeaderRow>
+          <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
+          <ImportLine>${settings.ImportLine}</ImportLine>
+        </FormatSpecificOptions>
 `, 'Output', ['Output'], node.rawText)
 }

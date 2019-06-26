@@ -8,19 +8,19 @@ import Func from "./Functions/Function"
 const XMLHeader = `<?xml version="1.0"?>
 <AlteryxDocument yxmdVer="2019.1">
   <Nodes>
-  <Node ToolID="1">
-  <GuiSettings Plugin="AlteryxGuiToolkit.Questions.Tab.Tab">
-    <Position x="0" y="0" width="59" height="59" />
-  </GuiSettings>
-  <Properties>
-    <Configuration />
-    <Annotation DisplayMode="0">
-      <Name />
-      <DefaultAnnotationText />
-      <Left value="False" />
-    </Annotation>
-  </Properties>
-</Node>
+    <Node ToolID="1">
+      <GuiSettings Plugin="AlteryxGuiToolkit.Questions.Tab.Tab">
+        <Position x="0" y="0" width="59" height="59" />
+      </GuiSettings>
+      <Properties>
+        <Configuration />
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+    </Node>
 `
 
 const XMLMiddle = `
@@ -28,8 +28,7 @@ const XMLMiddle = `
   <Connections>
 `
 
-const XMLFooter = `
-  </Connections>
+const XMLFooter = `  </Connections>
   <Properties>
     <RuntimeProperties>
       <Actions />
@@ -107,9 +106,7 @@ export class AlteryxNode {
       <Position x="${20}" y="${20 + 75 * this.nodeId}" />
     </GuiSettings>
     <Properties>
-      <Configuration>
-${this.xmlConfig}
-      </Configuration>
+      <Configuration>${this.xmlConfig}      </Configuration>
 ${
   this.annotation ? `      <Annotation DisplayMode="0">
         <AnnotationText>${EscapeXml(this.annotation)}</AnnotationText>
