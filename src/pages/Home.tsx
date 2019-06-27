@@ -9,7 +9,10 @@ import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import parser from '../services/parser'
 import { Evaluator } from '../services/evaluator'
+import { AlteryxDocument } from '../services/AlteryxDocument'
 import { Toolbar, Button, Icon } from '@material-ui/core'
+import DownloadButton from "../components/DownloadButton"
+import NodeGraph from "../components/NodeGraph"
 
 const styles = createStyles({
   root: {
@@ -33,6 +36,7 @@ const Home: React.FC<Props> = (props: Props) => {
 
   const [ code, setCode ] = useState<string>(window.localStorage.getItem('parserRaw') || '')
   const [ xml, setXml ] = useState<string>('')
+  const [ ayxDoc, setAyxDoc ] = useState<AlteryxDocument>(new AlteryxDocument())
   const [ tabValue, setTabValue ] = useState<number>(0)
 
   const handleOnChange = (event: any) => {
@@ -54,23 +58,12 @@ const Home: React.FC<Props> = (props: Props) => {
         console.log(evaluator.variables, evaluator.document.nodes, evaluator.document.connections)
 
         setXml(evaluator.document.renderXml())
+        setAyxDoc(evaluator.document)
       })
     } catch (e) {
       setXml(`<Error>Unable to tokenise: ${e.message}</Error>`)
+      setAyxDoc(new AlteryxDocument())
     }
-  }
-
-  const download = () => {
-    const url = URL.createObjectURL(new Blob([xml], {type: 'text/xml'}))
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `workflow.yxwz`
-    document.body.appendChild(a)
-    a.click()
-    setTimeout(function() { 
-        document.body.removeChild(a) 
-        window.URL.revokeObjectURL(url) 
-    }, 0)
   }
 
   const execute= () => {
@@ -116,18 +109,15 @@ const Home: React.FC<Props> = (props: Props) => {
         </Grid>
         <Grid item xs={6}>
           <Toolbar>
-            <Button variant="contained" color="primary" onClick={download} disabled={xml === '' || xml.substring(0,7) === '<Error>'}>
-              <Icon>save_alt</Icon>&nbsp;
-              Download
-            </Button>
+            <DownloadButton filename="workflow.yxwz" mimetype="text/xml" content={xml} />
             <Button variant="contained" color="primary" onClick={execute} disabled={xml === '' || xml.substring(0,7) === '<Error>'}>
               <Icon>play_arrow</Icon>&nbsp;
               Execute
             </Button>
           </Toolbar>
-          <Tabs value={tabValue} onChange={(e, n) => setTabValue(n)} disabled={xml === ''}>
-            <Tab label="Workflow XML">Workflow XML</Tab>
-            <Tab label="Node Graph">Node Graph</Tab>
+          <Tabs value={tabValue} onChange={(e, n) => { console.log(n); setTabValue(n) } } disabled={xml === ''}>
+            <Tab label="Workflow XML" />
+            <Tab label="Node Graph" />
           </Tabs>
           {tabValue === 0 &&
           <GridList cols={1} cellHeight={'auto'}>
@@ -137,6 +127,9 @@ const Home: React.FC<Props> = (props: Props) => {
               </pre>
             </GridListTile>
           </GridList>}
+          {tabValue === 1 &&
+          <NodeGraph document={ayxDoc}>
+          </NodeGraph>}
         </Grid>
       </Grid>
     </div>
