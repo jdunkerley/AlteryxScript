@@ -5,7 +5,7 @@ import { Evaluator, AlteryxNode } from "../evaluator"
 
 // ToDo: GroupBy
 
-export default (node:FunctionNode, evaluator: Evaluator) => {
+function sample(node:FunctionNode, evaluator: Evaluator, keyNames: string[]) {
   if (node.Children.length === 0) {
     throw new SyntaxError("Sample requires a filename")
   }
@@ -15,7 +15,6 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
     throw new SyntaxError("Sample first argument must be a connection")
   }
 
-  const keyNames = ['Skip', 'First', 'Last']
   const settings: Record<string, string> = {}
   keyNames.forEach(k => settings[k] = '')
   evaluator.evaluateSettings(node, settings)
@@ -37,3 +36,5 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
   })
   return output
 }
+
+export default (node:FunctionNode, evaluator: Evaluator) => sample(node, evaluator, ['Skip', 'First', 'Last'])

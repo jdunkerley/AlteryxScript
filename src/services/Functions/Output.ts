@@ -3,7 +3,6 @@ import { Evaluator, AlteryxNode } from "../evaluator"
 
 // First argument: Connection
 // Second argument: Filename
-
 const name = "RecordID"
 
 export default (node:FunctionNode, evaluator: Evaluator) => {
@@ -33,5 +32,6 @@ export default (node:FunctionNode, evaluator: Evaluator) => {
 `, null, [], node.rawText)
 
     evaluator.addConnection(firstChild.nodeId, firstChild.defaultConnection, newNode.nodeId, 'Input')
-    return newNode
+
+    return firstChild
 }

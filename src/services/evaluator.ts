@@ -101,20 +101,27 @@ export class AlteryxNode {
   }
 
   RenderXml() {
+    const pluginAttribute = this.plugin === 'Macro' ? '' : `Plugin="${this.plugin}"`
+
+    const engineSettings = this.engineDll === 'Macro'
+      ? `<EngineSettings Macro="${this.engineEntryPoint}" />`
+      : `<EngineSettings EngineDll="${this.engineDll}" EngineDllEntryPoint="${this.engineEntryPoint}" />`
+
     return `    <Node ToolID="${this.nodeId}">
-    <GuiSettings Plugin="${this.plugin}">
+    <GuiSettings ${pluginAttribute}>
       <Position x="${20}" y="${20 + 75 * this.nodeId}" />
     </GuiSettings>
     <Properties>
       <Configuration>${this.xmlConfig}      </Configuration>
 ${
-  this.annotation ? `      <Annotation DisplayMode="0">
+  this.annotation 
+    ? `      <Annotation DisplayMode="0">
         <AnnotationText>${EscapeXml(this.annotation)}</AnnotationText>
       </Annotation>`
-  : ''
+    : ''
 }
     </Properties>
-    <EngineSettings EngineDll="${this.engineDll}" EngineDllEntryPoint="${this.engineEntryPoint}" />
+    ${engineSettings}
   </Node>
 `
   }

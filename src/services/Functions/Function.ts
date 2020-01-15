@@ -2,14 +2,18 @@ import { BaseNode, FunctionNode } from "../Nodes"
 import { Evaluator, VariableType } from "../evaluator"
 import Input from "./Input"
 import Sample from "./Sample"
+import Count from "./Count"
 import Output from "./Output"
-import RecordID from "./RecordID";
+import RecordID from "./RecordID"
+import ConsoleLog from "./ConsoleLog"
 
 const functions: Record<string, (node:FunctionNode, evaluator: Evaluator) => VariableType> = {
   "input": Input,
   "sample": Sample,
+  "count": Count,
   "output": Output,
-  "recordid": RecordID
+  "recordid": RecordID,
+  "consolelog": ConsoleLog
 }
 
 export default (node:BaseNode, evaluator: Evaluator) => {
