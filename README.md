@@ -2,6 +2,8 @@
 
 An experiment to create a script language which will compile into Alteryx workflows.
 
+Live demo at https://alterscript.io
+
 ## Available Scripts
 
 In the project directory, you can run:
